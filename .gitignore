@@ -9,6 +9,9 @@ assignments_report.md
 # 配置文件（含密钥，不要提交！）
 config.json
 
+# 日志目录
+logs/
+
 # 系统文件
 .DS_Store
 Thumbs.db

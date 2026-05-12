@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.liru.homework.reminder</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>{{SCRIPT_DIR}}/run.sh</string>
+        <string>--headless</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>{{SCRIPT_DIR}}</string>
+
+    <!-- 每天早上 8:00 运行 -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>8</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <!-- 日志输出 -->
+    <key>StandardOutPath</key>
+    <string>{{SCRIPT_DIR}}/logs/launchd.log</string>
+    <key>StandardErrorPath</key>
+    <string>{{SCRIPT_DIR}}/logs/launchd_err.log</string>
+
+    <!-- 环境变量：确保 python3 能找到 -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+</dict>
+</plist>

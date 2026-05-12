@@ -2,6 +2,7 @@
 """
 华南师范大学 砺儒云课堂 - 作业抓取脚本
 弹出浏览器让用户手动登录，登录后自动抓取所有课程的作业和提交状态。
+支持 Cookie 保存复用，实现自动化定时运行。
 支持自动过滤本学期课程，多策略识别提交状态。
 """
 
@@ -17,10 +18,58 @@ MOODLE_URL = "https://moodle.scnu.edu.cn"
 LOGIN_URL = f"{MOODLE_URL}/login/index.php"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_OUTPUT = os.path.join(SCRIPT_DIR, "data", "assignments_raw.json")
+COOKIE_FILE = os.path.join(SCRIPT_DIR, "data", "cookies.json")
 
 # 默认本学期课程ID（用户可自行修改，或使用 --all 参数抓取全部课程）
 # 运行脚本时如不带 --course-ids，会先列出所有课程让你选择
 DEFAULT_SEMESTER_IDS = set()
+
+
+def save_cookies(context):
+    """保存浏览器 Cookie 到文件"""
+    cookies = context.cookies()
+    os.makedirs(os.path.dirname(COOKIE_FILE), exist_ok=True)
+    with open(COOKIE_FILE, "w", encoding="utf-8") as f:
+        json.dump(cookies, f, ensure_ascii=False, indent=2)
+    print(f"[Cookie] 已保存到 {COOKIE_FILE}")
+
+
+def load_cookies(context):
+    """从文件加载 Cookie 到浏览器，返回是否成功"""
+    if not os.path.exists(COOKIE_FILE):
+        return False
+    try:
+        with open(COOKIE_FILE, "r", encoding="utf-8") as f:
+            cookies = json.load(f)
+        if not cookies:
+            return False
+        context.add_cookies(cookies)
+        return True
+    except Exception:
+        return False
+
+
+def check_logged_in(page):
+    """检查当前是否已登录（通过 Cookie）"""
+    try:
+        page.goto(f"{MOODLE_URL}/my/", wait_until="domcontentloaded", timeout=15000)
+        # 如果跳转到了登录页，说明 Cookie 已过期
+        if "login" in page.url:
+            return False
+        # 检查页面是否有用户相关元素
+        page.wait_for_load_state("networkidle", timeout=10000)
+        has_content = page.evaluate("""
+            () => {
+                // 页面包含课程列表或用户菜单，说明已登录
+                const hasCourse = document.querySelector('a[href*="/course/view.php"]');
+                const hasUserMenu = document.querySelector('.usermenu, [data-region="user-menu"]');
+                const hasDashboard = document.querySelector('.dashboard, .mydashboard');
+                return hasCourse || hasUserMenu || hasDashboard;
+            }
+        """)
+        return bool(has_content)
+    except Exception:
+        return False
 
 
 def wait_for_manual_login(page):
@@ -350,6 +399,8 @@ def main():
                        help="指定课程ID（逗号分隔），如 --course-ids 19038,18969")
     parser.add_argument("-o", "--output", type=str, default=DEFAULT_OUTPUT,
                        help=f"输出JSON路径（默认: data/assignments_raw.json）")
+    parser.add_argument("--headless", action="store_true",
+                       help="无头模式（不弹出浏览器，用于定时任务自动运行）")
     args = parser.parse_args()
 
     print("=" * 60)
@@ -359,7 +410,7 @@ def main():
 
     with sync_playwright() as p:
         browser = p.chromium.launch(
-            headless=False,
+            headless=args.headless,
             args=["--no-sandbox"]
         )
         context = browser.new_context(
@@ -369,9 +420,32 @@ def main():
         page = context.new_page()
 
         try:
-            if not wait_for_manual_login(page):
-                browser.close()
-                sys.exit(1)
+            # 尝试复用已保存的 Cookie
+            logged_in = False
+            if load_cookies(context):
+                print("\n[Cookie] 发现已保存的登录信息，尝试自动登录...")
+                if check_logged_in(page):
+                    print("[Cookie] 自动登录成功！")
+                    logged_in = True
+                    # Cookie 有效，刷新保存一次
+                    save_cookies(context)
+                else:
+                    print("[Cookie] Cookie 已过期，需要重新登录")
+                    os.remove(COOKIE_FILE)
+
+            if not logged_in:
+                if args.headless:
+                    print("\n[ERROR] Cookie 已过期，无头模式下无法手动登录。")
+                    print("请先运行一次非无头模式登录：python fetch.py")
+                    browser.close()
+                    sys.exit(1)
+
+                if not wait_for_manual_login(page):
+                    browser.close()
+                    sys.exit(1)
+
+                # 登录成功，保存 Cookie
+                save_cookies(context)
 
             courses = get_courses(page)
             if not courses:
@@ -436,8 +510,12 @@ def main():
                 json.dump(output, f, ensure_ascii=False, indent=2)
             print(f"\n数据已保存: {args.output}")
 
-            print("\n完成！3秒后关闭浏览器...")
-            page.wait_for_timeout(3000)
+            # 抓取完成后更新 Cookie（可能续期了）
+            save_cookies(context)
+
+            if not args.headless:
+                print("\n完成！3秒后关闭浏览器...")
+                page.wait_for_timeout(3000)
 
         except Exception as e:
             print(f"\n[ERROR] 出错: {e}")

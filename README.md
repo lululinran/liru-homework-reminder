@@ -133,6 +133,85 @@ cp config.json.example config.json
 
 > 三种推送方式可以同时启用，也可以只用一种。不填的字段留空即可。
 
+## 定时自动提醒
+
+配置完成后，可以让脚本**每天早上自动运行**，无需手动操作。
+
+### 前置准备（macOS / Windows 通用）
+
+1. **先手动运行一次**（保存 Cookie，让自动模式能用）：
+
+```bash
+python fetch.py          # 弹出浏览器，手动登录，完成后 Cookie 已保存
+python report.py        # 生成报告 + 推送测试
+```
+
+2. **配置推送**（见上方「配置推送」章节），确保 `config.json` 已填写。
+
+> Cookie 有效期通常为几天到几周，过期后需要重新手动运行一次 `python fetch.py` 刷新。
+
+---
+
+### macOS：安装定时任务
+
+```bash
+chmod +x setup_launchd.sh
+./setup_launchd.sh install
+```
+
+安装后，脚本会**每天早上 8:00 自动运行**（抓取最新数据 → 生成报告 → 推送微信/邮件）。
+
+**管理任务：**
+
+```bash
+./setup_launchd.sh status    # 查看状态
+./setup_launchd.sh run       # 立即手动触发一次（不等定时）
+./setup_launchd.sh uninstall # 取消定时任务
+```
+
+**修改提醒时间：** 编辑 `launchd.com.liru.homework.reminder.plist.template`，修改 `Hour` 和 `Minute` 字段，然后重新运行 `./setup_launchd.sh install`。
+
+**查看日志：** `tail -f logs/launchd.log`
+
+---
+
+### Windows：安装定时任务
+
+以**管理员身份**打开 PowerShell，进入项目目录：
+
+```powershell
+# 安装定时任务（每天早 8:00）
+.\setup_task.ps1 install
+
+# 查看状态
+.\setup_task.ps1 status
+
+# 立即手动触发一次
+.\setup_task.ps1 run
+
+# 卸载定时任务
+.\setup_task.ps1 uninstall
+```
+
+安装后，任务计划程序中会出现 `LiruHomeworkReminder` 任务，每天早上 8:00 自动运行。
+
+> **注意**：Windows 定时任务默认需要用户登录才能运行。如果希望锁屏时也能运行，可以在任务计划程序中右键任务 → 属性 → 安全选项 → 选择"无论用户是否登录都运行"。
+
+**查看日志：** `type logs\task.log`
+
+---
+
+### 两种运行模式说明
+
+| 模式 | 命令 | 用途 |
+|------|------|------|
+| 正常模式 | `python fetch.py`（无参数） | 首次使用、Cookie 过期时，需要弹出浏览器手动登录 |
+| 无头模式 | `python fetch.py --headless` | 定时任务用，不弹浏览器，依赖已保存的 Cookie |
+
+日常定时任务使用**无头模式**自动运行；如果推送失败并提示 Cookie 已过期，手动运行一次正常模式即可。
+
+
+
 ## 使用方法
 
 ### 第一步：抓取数据
@@ -232,15 +311,20 @@ python report.py --exclude-submitted "19038:实验一,18969:第一章作业"
 
 ```
 liru-homework-reminder/
-├── fetch.py                # 作业数据抓取脚本
-├── report.py               # 报告生成 + 推送脚本
-├── notify.py               # 推送模块（Server酱/企业微信/邮件）
-├── config.json.example     # 推送配置模板
-├── config.json             # 你的推送配置（含密钥，不要提交！）
-├── assignments_report.md   # 生成的报告（gitignored）
-└── data/                   # 数据目录（gitignored）
+├── fetch.py                     # 作业数据抓取脚本（支持 Cookie 复用）
+├── report.py                    # 报告生成 + 推送脚本
+├── notify.py                    # 推送模块（Server酱/企业微信/邮件）
+├── run.sh / run.bat            # 一键运行脚本（macOS / Windows）
+├── setup_launchd.sh            # macOS 定时任务安装脚本
+├── setup_task.ps1              # Windows 定时任务安装脚本
+├── launchd.*.plist.template   # macOS launchd 配置模板
+├── config.json.example          # 推送配置模板
+├── config.json                 # 你的推送配置（含密钥，不要提交！）
+├── assignments_report.md        # 生成的报告（gitignored）
+└── data/                       # 数据目录（gitignored）
     ├── assignments_raw.json    # 抓取的原始数据
-    └── assignments_report.json # 处理后的结构化数据
+    ├── assignments_report.json # 处理后的结构化数据
+    └── cookies.json           # 登录 Cookie（gitignored）
 ```
 
 ## 技术细节
