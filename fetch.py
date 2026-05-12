@@ -19,6 +19,7 @@ LOGIN_URL = f"{MOODLE_URL}/login/index.php"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_OUTPUT = os.path.join(SCRIPT_DIR, "data", "assignments_raw.json")
 COOKIE_FILE = os.path.join(SCRIPT_DIR, "data", "cookies.json")
+SELECTED_COURSES_FILE = os.path.join(SCRIPT_DIR, "data", "selected_courses.json")
 
 # 默认本学期课程ID（用户可自行修改，或使用 --all 参数抓取全部课程）
 # 运行脚本时如不带 --course-ids，会先列出所有课程让你选择
@@ -148,8 +149,43 @@ def get_courses(page):
     return courses
 
 
+def load_selected_courses():
+    """加载上次保存的课程选择"""
+    if os.path.exists(SELECTED_COURSES_FILE):
+        try:
+            with open(SELECTED_COURSES_FILE, "r", encoding="utf-8") as f:
+                return set(json.load(f))
+        except Exception:
+            return set()
+    return set()
+
+
+def save_selected_courses(course_ids):
+    """保存课程选择到文件"""
+    os.makedirs(os.path.dirname(SELECTED_COURSES_FILE), exist_ok=True)
+    with open(SELECTED_COURSES_FILE, "w", encoding="utf-8") as f:
+        json.dump(list(course_ids), f, ensure_ascii=False, indent=2)
+
+
 def select_courses_interactive(courses):
-    """交互式选择要抓取的课程"""
+    """交互式选择要抓取的课程，支持记忆上次选择"""
+    saved_ids = load_selected_courses()
+    
+    # 如果有保存的选择，先提示是否复用
+    if saved_ids:
+        saved_names = [c['fullname'] for c in courses if c.get('id') in saved_ids]
+        if saved_names:
+            print("\n" + "-" * 60)
+            print("  检测到上次选择的课程：")
+            for name in saved_names:
+                print(f"    - {name}")
+            print("-" * 60)
+            reuse = input("  是否继续使用这些课程？(y/n，默认 y): ").strip().lower()
+            if reuse in ('', 'y', 'yes', '是'):
+                selected = [c for c in courses if c.get('id') in saved_ids]
+                print(f"\n已复用 {len(selected)} 门课程")
+                return selected
+
     print("\n" + "-" * 60)
     print("  请选择要抓取的课程（输入编号，逗号分隔，a=全选）：")
     print("-" * 60)
@@ -174,6 +210,11 @@ def select_courses_interactive(courses):
     print(f"\n已选择 {len(selected)} 门课程:")
     for c in selected:
         print(f"  - {c['fullname']}")
+    
+    # 保存选择
+    selected_ids = [c.get('id') for c in selected]
+    save_selected_courses(selected_ids)
+    print(f"\n[已保存课程选择，下次运行会自动复用]")
     return selected
 
 
@@ -244,7 +285,7 @@ def get_course_assignments(page, course_id, course_name):
                         let status = '';
                         let submitted = false;
 
-                        // 策略1: 文字匹配
+                        // 策略1: 文字匹配（先遍历所有列找"已提交"，再找"未提交"，避免"-"列提前break）
                         for (let ci = 1; ci < cols.length; ci++) {{
                             const colText = cols[ci].textContent.trim();
                             if (colText.includes('已提交') || colText.toLowerCase().includes('submitted') || colText === '是') {{
@@ -252,10 +293,15 @@ def get_course_assignments(page, course_id, course_name):
                                 submitted = true;
                                 break;
                             }}
-                            if (colText.includes('未提交') || colText.toLowerCase().includes('not submitted') || colText === '-' || colText === '否') {{
-                                status = colText;
-                                submitted = false;
-                                break;
+                        }}
+                        if (!submitted) {{
+                            for (let ci = 1; ci < cols.length; ci++) {{
+                                const colText = cols[ci].textContent.trim();
+                                if (colText.includes('未提交') || colText.toLowerCase().includes('not submitted') || colText === '否') {{
+                                    status = colText;
+                                    submitted = false;
+                                    break;
+                                }}
                             }}
                         }}
 
