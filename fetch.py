@@ -193,6 +193,7 @@ def get_course_assignments(page, course_id, course_name):
         (courseName) => {{
             const results = [];
             const courseId = {course_id};
+            courseName = courseName || '课程-' + courseId;
 
             // 查找作业表格
             const tables = document.querySelectorAll('table');
@@ -216,15 +217,27 @@ def get_course_assignments(page, course_id, course_name):
 
                         for (let ci = 1; ci < cols.length; ci++) {{
                             const colText = cols[ci].textContent.trim();
-                            const dm = colText.match(/(\\d{{4}})年(\\d{{1,2}})月(\\d{{1,2}})日[^\\d]*(\\d{{1,2}}):(\\d{{2}})/);
-                            if (dm) {{
+                            // 格式1: 2026年5月18日 星期一 23:59
+                            let dm = colText.match(/(\\d{{4}})年(\\d{{1,2}})月(\\d{{1,2}})日[^\\d]*(\\d{{1,2}}):(\\d{{2}})/);
+                            if (!dm) {{
+                                // 格式2: 5月18日 23:59（无年份，默认当年）
+                                dm = colText.match(/(\\d{{1,2}})月(\\d{{1,2}})日[^\\d]*(\\d{{1,2}}):(\\d{{2}})/);
+                                if (dm) {{
+                                    dueDateText = colText;
+                                    dueTimestamp = new Date(
+                                        new Date().getFullYear(), parseInt(dm[1]) - 1,
+                                        parseInt(dm[2]), parseInt(dm[3]), parseInt(dm[4])
+                                    ).getTime() / 1000;
+                                }}
+                            }}
+                            if (dm && !dueTimestamp) {{
                                 dueDateText = colText;
                                 dueTimestamp = new Date(
                                     parseInt(dm[1]), parseInt(dm[2]) - 1,
                                     parseInt(dm[3]), parseInt(dm[4]), parseInt(dm[5])
                                 ).getTime() / 1000;
-                                break;
                             }}
+                            if (dueTimestamp) break;
                         }}
 
                         // 提交状态检测（5种策略）
@@ -346,8 +359,18 @@ def get_course_assignments(page, course_id, course_name):
                         let dueDateText = '';
                         let dueTimestamp = 0;
                         const itemText = item.textContent;
-                        const dm = itemText.match(/(\\d{{4}})年(\\d{{1,2}})月(\\d{{1,2}})日[^\\d]*(\\d{{1,2}}):(\\d{{2}})/);
-                        if (dm) {{
+                        let dm = itemText.match(/(\\d{{4}})年(\\d{{1,2}})月(\\d{{1,2}})日[^\\d]*(\\d{{1,2}}):(\\d{{2}})/);
+                        if (!dm) {{
+                            dm = itemText.match(/(\\d{{1,2}})月(\\d{{1,2}})日[^\\d]*(\\d{{1,2}}):(\\d{{2}})/);
+                            if (dm) {{
+                                dueDateText = dm[0];
+                                dueTimestamp = new Date(
+                                    new Date().getFullYear(), parseInt(dm[1]) - 1,
+                                    parseInt(dm[2]), parseInt(dm[3]), parseInt(dm[4])
+                                ).getTime() / 1000;
+                            }}
+                        }}
+                        if (dm && !dueTimestamp) {{
                             dueDateText = dm[0];
                             dueTimestamp = new Date(
                                 parseInt(dm[1]), parseInt(dm[2]) - 1,
@@ -386,7 +409,7 @@ def get_course_assignments(page, course_id, course_name):
 
             return results;
         }}
-    """)
+    """, course_name)
 
     return assignments
 

@@ -98,24 +98,39 @@ def main():
     for a in unsubmitted:
         cid = a.get("courseid", 0)
         name = a.get("name", "")
-        status_text = a.get("status", "")
-        desc_text = a.get("duedate_str", "")
+        duedate_str = a.get("duedate_str", "")
+        duedate_ts = a.get("duedate", 0)
 
-        due_dt = parse_chinese_date(status_text)
-        due_fmt = due_dt.strftime("%Y-%m-%d %H:%M") if due_dt else ""
+        course_name = a.get("course", f"课程-{cid}")
 
-        if not due_dt:
-            due_dt = parse_due_from_description(desc_text)
+        # 优先用 fetch.py 提供的 duedate timestamp
+        due_dt = None
+        due_fmt = ""
+
+        if duedate_ts and duedate_ts > 0:
+            try:
+                due_dt = datetime.fromtimestamp(duedate_ts, tz=timezone(timedelta(hours=8)))
+                due_fmt = due_dt.strftime("%Y-%m-%d %H:%M")
+            except (OSError, ValueError):
+                pass
+
+        # 回退: 从 duedate_str 文本解析
+        if not due_dt and duedate_str:
+            due_dt = parse_chinese_date(duedate_str)
             if due_dt:
                 due_fmt = due_dt.strftime("%Y-%m-%d %H:%M")
 
-        course_name = a.get("course", f"课程-{cid}")
+        # 再回退: 从描述文本中提取
+        if not due_dt and duedate_str:
+            due_dt = parse_due_from_description(duedate_str)
+            if due_dt:
+                due_fmt = due_dt.strftime("%Y-%m-%d %H:%M")
 
         processed.append({
             "name": name,
             "course": course_name,
             "courseid": cid,
-            "description": desc_text,
+            "description": duedate_str,
             "due_date": due_fmt,
             "due_timestamp": int(due_dt.timestamp()) if due_dt else 0,
         })
