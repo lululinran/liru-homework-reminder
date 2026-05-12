@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 砺儒云课堂 - 作业提醒报告生成器
-读取 fetch.py 的输出，生成 Markdown 报告。
-支持：手动标记已提交、按课程过滤。
+读取 fetch.py 的输出，生成 Markdown 报告，并支持推送到微信/企业微信/邮件。
+支持：手动标记已提交、按课程过滤、消息推送。
 """
 
 import json
@@ -10,6 +10,7 @@ import re
 import os
 import argparse
 from datetime import datetime, timezone, timedelta
+from notify import load_config, build_push_text, push_all
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_INPUT = os.path.join(SCRIPT_DIR, "data", "assignments_raw.json")
@@ -52,6 +53,8 @@ def main():
     parser.add_argument("--only-courses", type=str, default="",
                        help="只显示指定课程的作业（课程名关键词，逗号分隔），"
                             "例: --only-courses 机器学习,数据安全")
+    parser.add_argument("--no-push", action="store_true",
+                       help="跳过消息推送，只生成报告")
     args = parser.parse_args()
 
     with open(args.input, 'r', encoding='utf-8') as f:
@@ -235,6 +238,43 @@ def main():
     print(report_text)
     print(f"\n报告已保存: {args.output}")
     print(f"JSON已保存: {json_path}")
+
+    # 消息推送
+    if not args.no_push:
+        config = load_config()
+        if any(config.get(k) for k in ("serverchan", "wecom", "email")):
+            title = f"📖 砺儒作业提醒 ({now.strftime('%m-%d')})"
+            if total_unsubmitted == 0:
+                title += " 全部已提交"
+            elif len(overdue) > 0:
+                title += f" {len(overdue)}个已过期"
+            elif len(urgent) > 0:
+                title += f" {len(urgent)}个紧急"
+
+            summary = {
+                "total": total_unsubmitted,
+                "overdue": overdue,
+                "urgent": urgent,
+                "normal": normal,
+                "no_deadline": without_deadline,
+            }
+            push_text = build_push_text(report_text, summary)
+            results = push_all(title, push_text, report_text, config)
+
+            if results:
+                print("\n" + "-" * 40)
+                print("推送结果：")
+                for channel, ok, msg in results:
+                    status = "✅" if ok else "❌"
+                    print(f"  {status} {channel}: {msg}")
+            else:
+                print("\n[提示] 未配置推送渠道，跳过推送。"
+                      "创建 config.json 可开启微信/邮件提醒，详见 README。")
+        else:
+            print("\n[提示] 未找到 config.json，跳过推送。"
+                  "创建 config.json 可开启微信/邮件提醒，详见 README。")
+    else:
+        print("\n[已跳过推送] (--no-push)")
 
 
 if __name__ == "__main__":

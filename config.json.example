@@ -1,0 +1,15 @@
+{
+  "serverchan": {
+    "sendkey": ""
+  },
+  "wecom": {
+    "webhook": ""
+  },
+  "email": {
+    "smtp_host": "",
+    "smtp_port": 465,
+    "sender": "",
+    "password": "",
+    "receiver": ""
+  }
+}
