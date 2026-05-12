@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>砺儒作业提醒 · 再也不怕忘交作业</title>
+<title>砺儒作业提醒 v2.0 · Nanobot 微信推送 · 再也不怕忘交作业</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
 
@@ -319,9 +319,10 @@
   .tab-btn {
     flex: 1; padding: 12px 0; border: none;
     background: transparent; color: var(--text-dim);
-    font-size: 0.9rem; font-weight: 700; font-family: var(--font-body);
+    font-size: 0.85rem; font-weight: 700; font-family: var(--font-body);
     border-radius: 12px; cursor: pointer; transition: all 0.3s;
     display: flex; align-items: center; justify-content: center; gap: 8px;
+    white-space: nowrap;
   }
   .tab-btn svg { width: 18px; height: 18px; }
   .tab-btn.active {
@@ -638,15 +639,15 @@
       </svg>
     </div>
     <h1>再也不怕忘交作业</h1>
-    <p class="hero-sub">砺儒云课堂自动抓取 &middot; 到期<strong>微信提醒</strong><br>设置一次，每天自动推送，从此告别手忙脚乱</p>
+    <p class="hero-sub">砺儒云课堂自动抓取 &middot; <strong>微信直接推送</strong><br>设置一次，每天自动提醒，从此告别手忙脚乱</p>
     <div class="hero-badges">
       <span class="hbadge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         开源免费
       </span>
-      <span class="hbadge">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-        微信推送
+      <span class="hbadge" style="background:rgba(0,229,200,0.1);border-color:rgba(0,229,200,0.25);color:var(--cyan);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Nanobot 2.0
       </span>
       <span class="hbadge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -684,6 +685,10 @@
       <h2>每天早上，微信准时提醒</h2>
       <p>自动抓取砺儒云课堂所有课程作业，按截止日期分类推送。紧急作业高亮提示，从此不再遗漏任何截止日期。</p>
       <div class="push-logos">
+        <div class="push-logo-item" style="border-color:rgba(0,229,200,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <span style="color:var(--cyan);">Nanobot</span>
+        </div>
         <div class="push-logo-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           Server酱
@@ -744,7 +749,12 @@
     <p class="section-sub">选择你的操作系统，跟着步骤操作即可</p>
 
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('mac', this)">
+      <button class="tab-btn active" onclick="switchTab('nanobot', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Nanobot 2.0
+        <span style="background:linear-gradient(135deg,#00e5c8,#2dd4a0);color:#fff;font-size:0.65rem;padding:2px 8px;border-radius:100px;font-weight:700;">推荐</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('mac', this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.477 2 2 6.477 2 12c0 3.97 2.317 7.39 5.67 9.006.082-.605.284-1.286.615-1.887l1.24-2.238c.397-.713.595-1.515.595-2.328V14.5a2.5 2.5 0 012.5-2.5h1.76c.813 0 1.615-.198 2.328-.595l.374-.207A2.5 2.5 0 0119 13.11v2.343c0 .813.198 1.615.595 2.328l1.24 2.238c.331.601.533 1.282.615 1.887C21.683 19.39 24 15.97 24 12c0-5.523-4.477-10-10-10h-2z"/></svg>
         macOS
       </button>
@@ -754,8 +764,94 @@
       </button>
     </div>
 
+    <!-- Nanobot 2.0 (推荐) -->
+    <div id="panel-nanobot" class="tab-panel active">
+      <div class="step">
+        <div class="step-num s1">1</div>
+        <div class="step-head">
+          <div class="step-icon-box cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <h3>安装 Nanobot</h3>
+        </div>
+        <p>一条命令安装 Nanobot AI 助手，然后扫码登录微信。</p>
+        <div class="code-block" id="code-nb-1"><span class="cmd-comment"># 安装 nanobot（需要 Python 3.8+）</span>
+pip install nanobot-ai
+
+<span class="cmd-comment"># 启动微信 gateway（会弹二维码，微信扫码登录）</span>
+nanobot gateway<button class="copy-btn" onclick="copyCode('code-nb-1', this)">复制</button></div>
+        <div class="tip-box info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Nanobot 是一个开源 AI 助手框架，通过微信直接跟你对话、推送消息。不需要注册任何第三方服务。</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num s2">2</div>
+        <div class="step-head">
+          <div class="step-icon-box blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <h3>克隆项目 &amp; 安装依赖</h3>
+        </div>
+        <p>打开终端，克隆仓库并安装抓取依赖。</p>
+        <div class="code-block" id="code-nb-2"><span class="cmd-comment"># 克隆仓库</span>
+git clone https://github.com/lululinran/liru-homework-reminder.git
+cd liru-homework-reminder
+
+<span class="cmd-comment"># 安装 Python 依赖 + 浏览器引擎</span>
+pip install playwright
+playwright install chromium<button class="copy-btn" onclick="copyCode('code-nb-2', this)">复制</button></div>
+      </div>
+
+      <div class="step">
+        <div class="step-num s2" style="background:linear-gradient(135deg,#5682ff,#7ba4ff);">3</div>
+        <div class="step-head">
+          <div class="step-icon-box yellow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>登录砺儒云课堂</h3>
+        </div>
+        <p>首次运行会弹出浏览器，手动登录一次。登录后选择要监控的课程，之后会自动记住。</p>
+        <div class="code-block" id="code-nb-3"><span class="cmd-comment"># 首次运行 - 弹出浏览器，手动登录砺儒云课堂</span>
+<span class="cmd-comment"># 登录成功后选择要抓取的课程（只需选一次）</span>
+python3 fetch.py<button class="copy-btn" onclick="copyCode('code-nb-3', this)">复制</button></div>
+      </div>
+
+      <div class="step">
+        <div class="step-num s2" style="background:linear-gradient(135deg,#5682ff,#7ba4ff);">4</div>
+        <div class="step-head">
+          <div class="step-icon-box yellow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>配置定时推送</h3>
+        </div>
+        <p>配置 Nanobot 的 cron 技能，每天自动检查作业并微信推送。</p>
+        <div class="code-block" id="code-nb-4"><span class="cmd-comment"># 在 nanobot 的 HEARTBEAT 配置中添加 cron 任务</span>
+<span class="cmd-comment"># 每天 9:00 自动执行 check_moodle_v2.py</span>
+<span class="cmd-comment"># 脚本会调用 fetch.py 抓数据 + report.py 生成报告</span>
+<span class="cmd-comment"># 然后通过 nanobot 直接发微信消息给你</span>
+
+<span class="cmd-comment"># 具体 HEARTBEAT 配置参考项目 README 的 Nanobot 章节</span><button class="copy-btn" onclick="copyCode('code-nb-4', this)">复制</button></div>
+        <div class="tip-box info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>不需要配置 Server酱、不需要注册任何推送服务。Nanobot 直接通过微信发消息给你，完全免费。</span>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg, rgba(0,229,200,0.08), rgba(86,130,255,0.05));border:1px solid rgba(0,229,200,0.2);border-radius:var(--radius);padding:24px 20px;margin-top:12px;">
+        <h3 style="color:var(--cyan);font-size:1rem;margin-bottom:12px;">为什么推荐 Nanobot 方案？</h3>
+        <table style="width:100%;font-size:0.82rem;color:var(--text-dim);border-collapse:collapse;">
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);"><td style="padding:8px 0;font-weight:700;color:#fff;">推送方式</td><td style="padding:8px 0;">直接微信消息</td><td style="padding:8px 0;color:var(--text-dimmer);">需关注公众号</td></tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);"><td style="padding:8px 0;font-weight:700;color:#fff;">费用</td><td style="padding:8px 0;color:var(--green);">完全免费</td><td style="padding:8px 0;">免费版 5条/天</td></tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06);"><td style="padding:8px 0;font-weight:700;color:#fff;">配置难度</td><td style="padding:8px 0;">pip install + 扫码</td><td style="padding:8px 0;">注册 + 获取 Key + 填配置</td></tr>
+          <tr><td style="padding:8px 0;font-weight:700;color:#fff;">AI 能力</td><td style="padding:8px 0;color:var(--green);">可对话问作业</td><td style="padding:8px 0;color:var(--text-dimmer);">只推送</td></tr>
+        </table>
+      </div>
+    </div>
+
     <!-- macOS -->
-    <div id="panel-mac" class="tab-panel active">
+    <div id="panel-mac" class="tab-panel">
       <div class="step">
         <div class="step-num s1">1</div>
         <div class="step-head">
@@ -944,8 +1040,8 @@ python report.py<button class="copy-btn" onclick="copyCode('code-win-2', this)">
         <div class="feat-icon pink">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
         </div>
-        <h3>多渠道推送</h3>
-        <p>Server酱（微信）、企业微信、邮件，三选一或全开</p>
+        <h3>Nanobot 微信推送</h3>
+        <p>通过 Nanobot 直接发微信消息，免注册、免 Key、完全免费</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon green">
@@ -974,7 +1070,8 @@ python report.py<button class="copy-btn" onclick="copyCode('code-win-2', this)">
         前往 GitHub
       </a>
       <div class="footer-links">
-        <a href="https://sct.ftqq.com/" target="_blank">Server酱（微信推送）</a>
+        <a href="https://github.com/nanobot-ai/nanobot" target="_blank">Nanobot（微信推送）</a>
+        <a href="https://sct.ftqq.com/" target="_blank">Server酱</a>
         <a href="https://github.com/lululinran/liru-homework-reminder/issues" target="_blank">反馈问题</a>
       </div>
     </div>
