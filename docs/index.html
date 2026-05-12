@@ -975,7 +975,11 @@ function switchTab(os, btn) {
 // Copy code
 function copyCode(id, btn) {
   const el = document.getElementById(id);
-  const text = el.innerText.replace('复制', '').replace('已复制 ✓', '').trim();
+  // Clone the element, remove the button, then get text
+  const clone = el.cloneNode(true);
+  const btnInClone = clone.querySelector('.copy-btn');
+  if (btnInClone) btnInClone.remove();
+  const text = clone.textContent.trim();
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '已复制 ✓';
     btn.classList.add('copied');
