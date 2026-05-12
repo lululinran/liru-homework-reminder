@@ -14,6 +14,10 @@
 
 ## 快速开始
 
+> **怎么打开终端？**
+> - **macOS**：按 `Command + 空格` 调出搜索，输入 `Terminal` 或「终端」，按回车
+> - **Windows**：按 `Win + R`，输入 `powershell`，按回车；或右键开始菜单 →「Windows PowerShell」
+
 ```bash
 # 1. 克隆仓库
 git clone https://github.com/lululinran/liru-homework-reminder.git
