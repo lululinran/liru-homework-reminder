@@ -167,25 +167,20 @@ def save_selected_courses(course_ids):
         json.dump(list(course_ids), f, ensure_ascii=False, indent=2)
 
 
-def select_courses_interactive(courses):
-    """交互式选择要抓取的课程，支持记忆上次选择"""
+def select_courses(courses):
+    """确定要抓取的课程：有保存的选择就直接用，否则交互式选择"""
     saved_ids = load_selected_courses()
-    
-    # 如果有保存的选择，先提示是否复用
-    if saved_ids:
-        saved_names = [c['fullname'] for c in courses if c.get('id') in saved_ids]
-        if saved_names:
-            print("\n" + "-" * 60)
-            print("  检测到上次选择的课程：")
-            for name in saved_names:
-                print(f"    - {name}")
-            print("-" * 60)
-            reuse = input("  是否继续使用这些课程？(y/n，默认 y): ").strip().lower()
-            if reuse in ('', 'y', 'yes', '是'):
-                selected = [c for c in courses if c.get('id') in saved_ids]
-                print(f"\n已复用 {len(selected)} 门课程")
-                return selected
 
+    if saved_ids:
+        # 有保存的课程选择，直接复用，完全静默
+        selected = [c for c in courses if c.get('id') in saved_ids]
+        if selected:
+            print(f"\n[课程] 自动复用上次选择的 {len(selected)} 门课程（如需重新选择，删除 {SELECTED_COURSES_FILE}）")
+            for c in selected:
+                print(f"  - {c['fullname']}")
+            return selected
+
+    # 没有保存记录，进入交互式选择
     print("\n" + "-" * 60)
     print("  请选择要抓取的课程（输入编号，逗号分隔，a=全选）：")
     print("-" * 60)
@@ -210,11 +205,11 @@ def select_courses_interactive(courses):
     print(f"\n已选择 {len(selected)} 门课程:")
     for c in selected:
         print(f"  - {c['fullname']}")
-    
-    # 保存选择
+
+    # 保存选择，以后自动复用
     selected_ids = [c.get('id') for c in selected]
     save_selected_courses(selected_ids)
-    print(f"\n[已保存课程选择，下次运行会自动复用]")
+    print(f"\n[已保存课程选择，下次运行将自动复用]")
     return selected
 
 
@@ -531,7 +526,7 @@ def main():
                 selected_courses = courses
                 print(f"\n将抓取全部 {len(courses)} 门课程")
             else:
-                selected_courses = select_courses_interactive(courses)
+                selected_courses = select_courses(courses)
 
             if not selected_courses:
                 print("\n未选择任何课程，退出。")
