@@ -3,468 +3,988 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>砺儒作业提醒 · 安装指南</title>
+<title>砺儒作业提醒 · 再也不怕忘交作业</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --primary: #6366f1;
-    --primary-light: #818cf8;
-    --accent: #f59e0b;
-    --bg: #0f0f23;
-    --card: #1a1a3e;
-    --card-border: rgba(99,102,241,0.3);
-    --text: #e2e8f0;
-    --text-dim: #94a3b8;
-    --success: #10b981;
-    --radius: 16px;
+    --bg: #0a0e1a;
+    --bg-warm: #0d1020;
+    --card: rgba(18, 24, 48, 0.85);
+    --card-solid: #121830;
+    --border: rgba(86, 130, 255, 0.12);
+    --border-bright: rgba(86, 130, 255, 0.3);
+    --blue: #5682ff;
+    --blue-light: #7ba4ff;
+    --cyan: #00e5c8;
+    --yellow: #ffc940;
+    --pink: #ff6b9d;
+    --text: #e8ecf4;
+    --text-dim: #7a8baa;
+    --text-dimmer: #4a5670;
+    --green: #2dd4a0;
+    --radius: 20px;
+    --font-display: 'ZCOOL QingKe HuangYou', 'Noto Sans SC', sans-serif;
+    --font-body: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
+  html { scroll-behavior: smooth; }
+
   body {
-    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-body);
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
-  }
-
-  /* 背景动画 */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99,102,241,0.15) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(245,158,11,0.08) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 40px 20px 60px;
-  }
-
-  /* ── Hero ─────────────────────── */
-  .hero {
-    text-align: center;
-    margin-bottom: 48px;
-    animation: fadeUp 0.7s ease-out both;
-  }
-  .hero-icon {
-    font-size: 56px;
-    margin-bottom: 16px;
-    display: block;
-    filter: drop-shadow(0 0 24px rgba(99,102,241,0.5));
-  }
-  .hero h1 {
-    font-size: 2.4rem;
-    font-weight: 900;
-    background: linear-gradient(135deg, #818cf8, #6366f1, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 12px;
-  }
-  .hero p {
-    color: var(--text-dim);
-    font-size: 1.05rem;
     line-height: 1.7;
   }
-  .hero-badges {
-    margin-top: 18px;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
+
+  /* ═══════════════ Global BG ═══════════════ */
+  .bg-layer {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 50% at 15% 5%, rgba(86,130,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 85% 85%, rgba(0,229,200,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,107,157,0.04) 0%, transparent 60%);
   }
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(99,102,241,0.12);
-    border: 1px solid rgba(99,102,241,0.25);
-    border-radius: 100px;
-    padding: 5px 14px;
-    font-size: 0.82rem;
-    color: var(--primary-light);
+  /* Grid pattern */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(86,130,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(86,130,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
   }
 
-  /* ── Tab 切换 ─────────────────── */
-  .tab-bar {
+  .page-wrap {
+    position: relative; z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ═══════════════ HERO ═══════════════ */
+  .hero {
+    padding: 80px 0 40px;
+    text-align: center;
+    position: relative;
+  }
+  .hero-visual {
+    position: relative;
+    width: 280px; height: 200px;
+    margin: 0 auto 32px;
+  }
+  .hero-visual svg { width: 100%; height: 100%; }
+  /* floating particles around hero */
+  .hero-particles {
+    position: absolute; inset: -40px;
+    pointer-events: none;
+  }
+  .hero-particles span {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    animation: floatParticle 6s ease-in-out infinite;
+  }
+  .hero-particles span:nth-child(1) { background: var(--blue); left: 10%; top: 20%; animation-delay: 0s; }
+  .hero-particles span:nth-child(2) { background: var(--cyan); left: 80%; top: 10%; animation-delay: 1.2s; width: 4px; height: 4px; }
+  .hero-particles span:nth-child(3) { background: var(--yellow); left: 90%; top: 70%; animation-delay: 2.4s; width: 5px; height: 5px; }
+  .hero-particles span:nth-child(4) { background: var(--pink); left: 5%; top: 75%; animation-delay: 3.6s; width: 4px; height: 4px; }
+  .hero-particles span:nth-child(5) { background: var(--blue-light); left: 50%; top: 0%; animation-delay: 0.8s; width: 3px; height: 3px; }
+  .hero-particles span:nth-child(6) { background: var(--green); left: 60%; top: 95%; animation-delay: 2s; width: 5px; height: 5px; }
+
+  @keyframes floatParticle {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+    50% { transform: translateY(-18px) scale(1.3); opacity: 1; }
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 0%, var(--blue-light) 40%, var(--cyan) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    color: var(--text-dim);
+    font-size: 1.05rem;
+    max-width: 500px;
+    margin: 0 auto 24px;
+  }
+  .hero-sub strong { color: var(--cyan); font-weight: 500; }
+
+  .hero-badges {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  }
+  .hbadge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(86,130,255,0.08);
+    border: 1px solid rgba(86,130,255,0.18);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    color: var(--blue-light);
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+  }
+
+  /* ═══════════════ PHONE MOCKUP ═══════════════ */
+  .phone-section {
+    padding: 40px 0 60px;
     display: flex;
-    gap: 0;
-    margin-bottom: 32px;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .phone-mockup {
+    flex-shrink: 0;
+    width: 240px;
+    background: linear-gradient(160deg, #1a2040, #0f1428);
+    border-radius: 32px;
+    border: 2px solid rgba(86,130,255,0.15);
+    padding: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 80px rgba(86,130,255,0.08);
+    position: relative;
+  }
+  .phone-notch {
+    width: 80px; height: 20px;
+    background: #0a0e1a;
+    border-radius: 0 0 14px 14px;
+    margin: 0 auto 10px;
+  }
+  .phone-screen {
+    background: #0d1020;
+    border-radius: 18px;
+    padding: 14px;
+    font-size: 0.72rem;
+    color: #ccc;
+    line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .phone-screen .ps-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .phone-screen .ps-summary {
+    color: #7a8baa;
+    font-size: 0.68rem;
+    margin-bottom: 10px;
+  }
+  .phone-screen .ps-item {
+    background: rgba(86,130,255,0.06);
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+  }
+  .phone-screen .ps-item-name { color: #e8ecf4; font-weight: 500; }
+  .phone-screen .ps-item-meta { color: #5682ff; font-size: 0.65rem; margin-top: 2px; }
+  .phone-screen .ps-item-urgent { color: #ff6b9d; }
+
+  .phone-caption {
+    max-width: 320px;
+  }
+  .phone-caption h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .phone-caption p {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    margin-bottom: 16px;
+  }
+  .push-logos {
+    display: flex; gap: 14px; align-items: center;
+  }
+  .push-logo-item {
+    display: flex; align-items: center; gap: 8px;
     background: var(--card);
-    border-radius: var(--radius);
-    padding: 5px;
-    border: 1px solid var(--card-border);
-    animation: fadeUp 0.7s ease-out 0.15s both;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+  .push-logo-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  /* ═══════════════ FLOW DIAGRAM ═══════════════ */
+  .flow-section {
+    padding: 20px 0 60px;
+  }
+  .flow-section h2 {
+    font-family: var(--font-display);
+    text-align: center;
+    font-size: 1.6rem;
+    color: #fff;
+    margin-bottom: 40px;
+  }
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 140px;
+    text-align: center;
+    opacity: 0;
+    animation: flowIn 0.6s ease-out forwards;
+  }
+  .flow-node:nth-child(1) { animation-delay: 0.1s; }
+  .flow-node:nth-child(3) { animation-delay: 0.3s; }
+  .flow-node:nth-child(5) { animation-delay: 0.5s; }
+  .flow-node:nth-child(7) { animation-delay: 0.7s; }
+
+  @keyframes flowIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .flow-icon {
+    width: 64px; height: 64px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .flow-icon.blue { background: rgba(86,130,255,0.12); }
+  .flow-icon.cyan { background: rgba(0,229,200,0.10); }
+  .flow-icon.yellow { background: rgba(255,201,64,0.10); }
+  .flow-icon.pink { background: rgba(255,107,157,0.10); }
+
+  .flow-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fff;
+  }
+  .flow-desc {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .flow-arrow {
+    color: var(--text-dimmer);
+    font-size: 1.2rem;
+    padding: 0 4px;
+    animation: arrowPulse 2s ease-in-out infinite;
+  }
+  @keyframes arrowPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  /* ═══════════════ TAB INSTALL ═══════════════ */
+  .install-section {
+    padding: 20px 0 60px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    text-align: center;
+    font-size: 1.6rem;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .section-sub {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+  }
+
+  .tab-bar {
+    display: flex; gap: 0; margin-bottom: 32px;
+    background: var(--card-solid);
+    border-radius: 16px; padding: 5px;
+    border: 1px solid var(--border);
   }
   .tab-btn {
-    flex: 1;
-    padding: 12px 0;
-    border: none;
-    background: transparent;
-    color: var(--text-dim);
-    font-size: 0.95rem;
-    font-weight: 700;
-    font-family: inherit;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.25s;
+    flex: 1; padding: 12px 0; border: none;
+    background: transparent; color: var(--text-dim);
+    font-size: 0.9rem; font-weight: 700; font-family: var(--font-body);
+    border-radius: 12px; cursor: pointer; transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
+  .tab-btn svg { width: 18px; height: 18px; }
   .tab-btn.active {
-    background: linear-gradient(135deg, var(--primary), #818cf8);
+    background: linear-gradient(135deg, var(--blue), #7ba4ff);
     color: #fff;
-    box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+    box-shadow: 0 4px 24px rgba(86,130,255,0.35);
   }
-  .tab-btn:hover:not(.active) {
-    color: var(--text);
-    background: rgba(255,255,255,0.04);
-  }
+  .tab-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.03); }
+
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
-  /* ── 步骤卡片 ─────────────────── */
+  /* Step cards */
   .step {
     background: var(--card);
-    border: 1px solid var(--card-border);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 28px 28px 24px;
+    padding: 32px 28px 24px;
     margin-bottom: 20px;
     position: relative;
-    animation: fadeUp 0.6s ease-out both;
+    backdrop-filter: blur(12px);
+    transition: border-color 0.3s, box-shadow 0.3s;
   }
-  .step:nth-child(1) { animation-delay: 0.2s; }
-  .step:nth-child(2) { animation-delay: 0.35s; }
-  .step:nth-child(3) { animation-delay: 0.5s; }
+  .step:hover {
+    border-color: var(--border-bright);
+    box-shadow: 0 8px 40px rgba(86,130,255,0.06);
+  }
+  .step-num {
+    position: absolute; top: -15px; left: 24px;
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 0.85rem; color: #fff;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .step-num.s1 { background: linear-gradient(135deg, #5682ff, #7ba4ff); }
+  .step-num.s2 { background: linear-gradient(135deg, #00e5c8, #2dd4a0); }
+  .step-num.s3 { background: linear-gradient(135deg, #ffc940, #ffaa00); }
 
-  .step-number {
-    position: absolute;
-    top: -14px;
-    left: 24px;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: #fff;
-    font-weight: 900;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 12px rgba(99,102,241,0.4);
+  .step-head {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 10px;
   }
-  .step-icon { font-size: 1.6rem; margin-bottom: 8px; display: block; }
-  .step h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 6px;
-    color: #fff;
+  .step-icon-box {
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
   }
-  .step p {
-    font-size: 0.88rem;
-    color: var(--text-dim);
-    line-height: 1.65;
-    margin-bottom: 14px;
-  }
+  .step-icon-box svg { width: 24px; height: 24px; }
+  .step-icon-box.blue { background: rgba(86,130,255,0.1); }
+  .step-icon-box.cyan { background: rgba(0,229,200,0.1); }
+  .step-icon-box.yellow { background: rgba(255,201,64,0.1); }
 
-  /* Code block */
+  .step h3 { font-size: 1.05rem; font-weight: 700; color: #fff; }
+  .step p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 16px; }
+
   .code-block {
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 14px 16px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 0.82rem;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 16px 18px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.8rem;
     color: #a5b4fc;
-    line-height: 1.7;
+    line-height: 1.8;
     white-space: pre-wrap;
     word-break: break-all;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     position: relative;
   }
+  .code-block .cmd-comment { color: var(--text-dimmer); }
+  .code-block .cmd-accent { color: var(--cyan); }
+
   .copy-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(99,102,241,0.2);
-    border: 1px solid rgba(99,102,241,0.3);
-    color: var(--primary-light);
-    border-radius: 8px;
-    padding: 4px 10px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(86,130,255,0.15);
+    border: 1px solid rgba(86,130,255,0.25);
+    color: var(--blue-light); border-radius: 8px;
+    padding: 4px 12px; font-size: 0.72rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; font-family: var(--font-body);
   }
-  .copy-btn:hover { background: rgba(99,102,241,0.35); }
-  .copy-btn.copied { background: rgba(16,185,129,0.2); border-color: var(--success); color: var(--success); }
+  .copy-btn:hover { background: rgba(86,130,255,0.25); }
+  .copy-btn.copied { background: rgba(45,212,160,0.15); border-color: var(--green); color: var(--green); }
 
-  .tip {
-    background: rgba(245,158,11,0.08);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 10px 10px 0;
-    padding: 10px 14px;
-    font-size: 0.82rem;
-    color: #fbbf24;
+  .tip-box {
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.8rem;
     line-height: 1.6;
-    margin-top: 4px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .tip-box.info {
+    background: rgba(86,130,255,0.06);
+    border: 1px solid rgba(86,130,255,0.15);
+    color: var(--blue-light);
+  }
+  .tip-box.warn {
+    background: rgba(255,201,64,0.06);
+    border: 1px solid rgba(255,201,64,0.15);
+    color: var(--yellow);
+  }
+  .tip-box svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ═══════════════ FEATURES GRID ═══════════════ */
+  .features-section {
+    padding: 20px 0 60px;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .feat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feat-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-bright);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .feat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    border-radius: 2px 2px 0 0;
+  }
+  .feat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--blue), transparent); }
+  .feat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--cyan), transparent); }
+  .feat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--yellow), transparent); }
+  .feat-card:nth-child(4)::before { background: linear-gradient(90deg, var(--pink), transparent); }
+  .feat-card:nth-child(5)::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .feat-card:nth-child(6)::before { background: linear-gradient(90deg, var(--blue-light), transparent); }
+
+  .feat-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .feat-icon svg { width: 24px; height: 24px; }
+  .feat-icon.blue { background: rgba(86,130,255,0.1); }
+  .feat-icon.cyan { background: rgba(0,229,200,0.08); }
+  .feat-icon.yellow { background: rgba(255,201,64,0.08); }
+  .feat-icon.pink { background: rgba(255,107,157,0.08); }
+  .feat-icon.green { background: rgba(45,212,160,0.08); }
+
+  .feat-card h3 {
+    font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 6px;
+  }
+  .feat-card p {
+    font-size: 0.8rem; color: var(--text-dim); line-height: 1.6;
   }
 
-  /* ── 页尾 ─────────────────────── */
-  .footer {
+  /* ═══════════════ CTA / FOOTER ═══════════════ */
+  .cta-section {
+    padding: 40px 0 60px;
     text-align: center;
-    margin-top: 48px;
-    padding-top: 28px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    animation: fadeUp 0.7s ease-out 0.65s both;
   }
-  .footer a {
+  .cta-box {
+    background: linear-gradient(135deg, rgba(86,130,255,0.1), rgba(0,229,200,0.05));
+    border: 1px solid rgba(86,130,255,0.2);
+    border-radius: 24px;
+    padding: 48px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-box::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(86,130,255,0.15), transparent 70%);
+    border-radius: 50%;
+  }
+  .cta-box h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .cta-box p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .cta-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, var(--primary), #818cf8);
+    gap: 10px;
+    background: linear-gradient(135deg, #5682ff, #7ba4ff);
     color: #fff;
     text-decoration: none;
-    padding: 12px 28px;
+    padding: 14px 32px;
     border-radius: 100px;
     font-weight: 700;
     font-size: 0.95rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+    font-family: var(--font-body);
+    transition: transform 0.25s, box-shadow 0.25s;
+    box-shadow: 0 4px 24px rgba(86,130,255,0.3);
+    position: relative;
+    border: none; cursor: pointer;
   }
-  .footer a:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.45); }
+  .cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 36px rgba(86,130,255,0.45);
+  }
+  .cta-btn svg { width: 20px; height: 20px; }
+
   .footer-links {
-    margin-top: 16px;
-    display: flex;
-    gap: 20px;
-    justify-content: center;
+    display: flex; gap: 24px; justify-content: center;
+    margin-top: 28px; position: relative;
   }
   .footer-links a {
-    background: none;
-    box-shadow: none;
-    color: var(--text-dim);
-    font-size: 0.82rem;
-    padding: 4px 0;
-    border-radius: 0;
+    color: var(--text-dim); text-decoration: none; font-size: 0.82rem;
+    transition: color 0.2s;
   }
-  .footer-links a:hover { color: var(--primary-light); box-shadow: none; transform: none; }
+  .footer-links a:hover { color: var(--blue-light); }
 
-  /* ── Cookie 方案说明 ────────── */
-  .cookie-note {
-    background: rgba(16,185,129,0.06);
-    border: 1px solid rgba(16,185,129,0.2);
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    margin-top: 28px;
-    animation: fadeUp 0.7s ease-out 0.8s both;
-  }
-  .cookie-note h4 { color: var(--success); font-size: 0.95rem; margin-bottom: 8px; }
-  .cookie-note p { font-size: 0.84rem; color: var(--text-dim); line-height: 1.65; }
-  .cookie-note code {
-    background: rgba(16,185,129,0.1);
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 0.82rem;
-    color: #6ee7b7;
+  .copyright {
+    text-align: center;
+    padding: 20px 0 40px;
+    color: var(--text-dimmer);
+    font-size: 0.75rem;
   }
 
-  /* ── 动画 ─────────────────────── */
+  /* ═══════════════ ANIMATIONS ═══════════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
+  .hero > * { animation: fadeUp 0.7s ease-out both; }
+  .hero > *:nth-child(2) { animation-delay: 0.1s; }
+  .hero > *:nth-child(3) { animation-delay: 0.2s; }
+  .hero > *:nth-child(4) { animation-delay: 0.3s; }
 
-  /* ── 移动端 ──────────────────── */
-  @media (max-width: 600px) {
-    .container { padding: 24px 14px 40px; }
-    .hero h1 { font-size: 1.7rem; }
-    .hero-icon { font-size: 44px; }
-    .step { padding: 22px 18px 18px; }
-    .code-block { font-size: 0.76rem; padding: 12px; }
+  /* ═══════════════ RESPONSIVE ═══════════════ */
+  @media (max-width: 640px) {
+    .hero { padding: 50px 0 30px; }
+    .hero-visual { width: 200px; height: 150px; margin-bottom: 24px; }
+    .phone-section { flex-direction: column; gap: 24px; }
+    .phone-mockup { width: 220px; }
+    .phone-caption { text-align: center; }
+    .flow-diagram { flex-direction: column; gap: 8px; }
+    .flow-arrow { transform: rotate(90deg); }
+    .flow-node { width: 100%; }
+    .step { padding: 26px 20px 20px; }
+    .cta-box { padding: 36px 20px; }
+    .push-logos { flex-direction: column; align-items: center; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 420px) {
+    .features-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="bg-layer"></div>
+<div class="bg-grid"></div>
 
-  <!-- Hero -->
-  <div class="hero">
-    <span class="hero-icon">📖</span>
-    <h1>砺儒云课堂 · 作业提醒</h1>
-    <p>自动抓取砺儒云课堂作业，到期微信提醒你。<br>只需设置一次，之后每天自动提醒。</p>
-    <div class="hero-badges">
-      <span class="badge">🐍 Python 3.8+</span>
-      <span class="badge">🔔 微信推送</span>
-      <span class="badge">🍎 macOS / 🪟 Windows</span>
-      <span class="badge">⏰ 每日自动</span>
+<div class="page-wrap">
+
+  <!-- ═══════ HERO ═══════ -->
+  <section class="hero">
+    <div class="hero-visual">
+      <div class="hero-particles">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <svg viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Book base -->
+        <rect x="50" y="90" width="180" height="100" rx="8" fill="rgba(86,130,255,0.12)" stroke="rgba(86,130,255,0.3)" stroke-width="1.5"/>
+        <!-- Book spine shadow -->
+        <rect x="50" y="90" width="12" height="100" rx="4" fill="rgba(86,130,255,0.18)"/>
+        <!-- Page lines -->
+        <rect x="78" y="110" width="80" height="3" rx="1.5" fill="rgba(86,130,255,0.2)"/>
+        <rect x="78" y="120" width="110" height="3" rx="1.5" fill="rgba(86,130,255,0.15)"/>
+        <rect x="78" y="130" width="60" height="3" rx="1.5" fill="rgba(86,130,255,0.12)"/>
+        <rect x="78" y="140" width="95" height="3" rx="1.5" fill="rgba(86,130,255,0.15)"/>
+        <rect x="78" y="150" width="70" height="3" rx="1.5" fill="rgba(86,130,255,0.1)"/>
+        <!-- Alarm clock -->
+        <circle cx="200" cy="50" r="36" fill="rgba(0,229,200,0.08)" stroke="rgba(0,229,200,0.35)" stroke-width="2"/>
+        <circle cx="200" cy="50" r="28" fill="rgba(0,229,200,0.04)" stroke="rgba(0,229,200,0.15)" stroke-width="1"/>
+        <!-- Clock hands -->
+        <line x1="200" y1="50" x2="200" y2="32" stroke="rgba(0,229,200,0.6)" stroke-width="2" stroke-linecap="round"/>
+        <line x1="200" y1="50" x2="214" y2="44" stroke="rgba(0,229,200,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="200" cy="50" r="3" fill="rgba(0,229,200,0.7)"/>
+        <!-- Bell tops -->
+        <circle cx="178" cy="22" r="8" fill="rgba(255,201,64,0.15)" stroke="rgba(255,201,64,0.4)" stroke-width="1.5"/>
+        <circle cx="222" cy="22" r="8" fill="rgba(255,201,64,0.15)" stroke="rgba(255,201,64,0.4)" stroke-width="1.5"/>
+        <!-- Checkmark badge -->
+        <circle cx="80" cy="44" r="24" fill="rgba(45,212,160,0.1)" stroke="rgba(45,212,160,0.35)" stroke-width="1.5"/>
+        <polyline points="68,44 76,52 92,36" stroke="rgba(45,212,160,0.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Notification bell -->
+        <path d="M145 16 C145 10 151 4 159 4 C167 4 173 10 173 16 C173 22 178 26 178 30 L140 30 C140 26 145 22 145 16Z" fill="rgba(255,107,157,0.12)" stroke="rgba(255,107,157,0.4)" stroke-width="1.5"/>
+        <circle cx="159" cy="34" r="3" fill="rgba(255,107,157,0.5)"/>
+        <!-- Sound waves -->
+        <path d="M182 18 Q188 22 182 26" stroke="rgba(255,107,157,0.3)" stroke-width="1.2" fill="none"/>
+        <path d="M186 14 Q194 22 186 30" stroke="rgba(255,107,157,0.18)" stroke-width="1.2" fill="none"/>
+      </svg>
     </div>
-  </div>
+    <h1>再也不怕忘交作业</h1>
+    <p class="hero-sub">砺儒云课堂自动抓取 &middot; 到期<strong>微信提醒</strong><br>设置一次，每天自动推送，从此告别手忙脚乱</p>
+    <div class="hero-badges">
+      <span class="hbadge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        开源免费
+      </span>
+      <span class="hbadge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        微信推送
+      </span>
+      <span class="hbadge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        每日自动
+      </span>
+      <span class="hbadge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Mac + Win
+      </span>
+    </div>
+  </section>
 
-  <!-- Tab 栏 -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('mac')">🍎 macOS</button>
-    <button class="tab-btn" onclick="switchTab('win')">🪟 Windows</button>
-  </div>
+  <!-- ═══════ PUSH DEMO ═══════ -->
+  <section class="phone-section reveal">
+    <div class="phone-mockup">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="ps-title">砺儒云课堂 - 作业提醒</div>
+        <div class="ps-summary">共 2 个待办（过期 0 / 紧急 0 / 普通 2）</div>
+        <div class="ps-item">
+          <div class="ps-item-name">第四章数据加密</div>
+          <div class="ps-item-meta">数据安全 &middot; 剩 6 天 &middot; 05-18 23:59</div>
+        </div>
+        <div class="ps-item">
+          <div class="ps-item-name">课程项目</div>
+          <div class="ps-item-meta">Web系统开发 &middot; 剩 47 天 &middot; 06-29 00:00</div>
+        </div>
+        <div class="ps-item" style="border-left: 2px solid var(--pink);">
+          <div class="ps-item-name ps-item-urgent">实验报告二</div>
+          <div class="ps-item-meta ps-item-urgent">机器学习 &middot; 已过期! &middot; 05-10 23:59</div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-caption">
+      <h2>每天早上，微信准时提醒</h2>
+      <p>自动抓取砺儒云课堂所有课程作业，按截止日期分类推送。紧急作业高亮提示，从此不再遗漏任何截止日期。</p>
+      <div class="push-logos">
+        <div class="push-logo-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Server酱
+        </div>
+        <div class="push-logo-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          企业微信
+        </div>
+        <div class="push-logo-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          邮件
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <!-- macOS 面板 -->
-  <div id="panel-mac" class="tab-panel active">
+  <!-- ═══════ WORKFLOW ═══════ -->
+  <section class="flow-section reveal">
+    <h2>三步搞定，从此无忧</h2>
+    <div class="flow-diagram">
+      <div class="flow-node">
+        <div class="flow-icon blue">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="flow-label">安装工具</div>
+        <div class="flow-desc">一行命令克隆<br>安装依赖即可</div>
+      </div>
+      <div class="flow-arrow">&#x2192;</div>
+      <div class="flow-node">
+        <div class="flow-icon cyan">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="flow-label">登录一次</div>
+        <div class="flow-desc">浏览器弹出手动登录<br>Cookie 自动保存</div>
+      </div>
+      <div class="flow-arrow">&#x2192;</div>
+      <div class="flow-node">
+        <div class="flow-icon yellow">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+        <div class="flow-label">每日自动提醒</div>
+        <div class="flow-desc">定时任务自动运行<br>微信准时推送</div>
+      </div>
+      <div class="flow-arrow">&#x2192;</div>
+      <div class="flow-node">
+        <div class="flow-icon pink">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        </div>
+        <div class="flow-label">躺平享受</div>
+        <div class="flow-desc">再也不怕忘交作业<br>到期微信自动提醒</div>
+      </div>
+    </div>
+  </section>
 
-    <div class="step">
-      <div class="step-number">1</div>
-      <span class="step-icon">📦</span>
-      <h3>安装依赖</h3>
-      <p>先安装 Python 3.8+ 和 Playwright 浏览器引擎（只需运行一次）。</p>
-      <div class="code-block" id="code-mac-1">
+  <!-- ═══════ INSTALL ═══════ -->
+  <section class="install-section reveal">
+    <h2 class="section-title">安装指南</h2>
+    <p class="section-sub">选择你的操作系统，跟着步骤操作即可</p>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('mac', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.477 2 2 6.477 2 12c0 3.97 2.317 7.39 5.67 9.006.082-.605.284-1.286.615-1.887l1.24-2.238c.397-.713.595-1.515.595-2.328V14.5a2.5 2.5 0 012.5-2.5h1.76c.813 0 1.615-.198 2.328-.595l.374-.207A2.5 2.5 0 0119 13.11v2.343c0 .813.198 1.615.595 2.328l1.24 2.238c.331.601.533 1.282.615 1.887C21.683 19.39 24 15.97 24 12c0-5.523-4.477-10-10-10h-2z"/></svg>
+        macOS
+      </button>
+      <button class="tab-btn" onclick="switchTab('win', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 8l4 4-4 4"/><path d="M13 15h4"/></svg>
+        Windows
+      </button>
+    </div>
+
+    <!-- macOS -->
+    <div id="panel-mac" class="tab-panel active">
+      <div class="step">
+        <div class="step-num s1">1</div>
+        <div class="step-head">
+          <div class="step-icon-box blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <h3>克隆 &amp; 安装依赖</h3>
+        </div>
+        <p>打开终端（Terminal），粘贴以下命令。只需运行一次。</p>
+        <div class="code-block" id="code-mac-1"><span class="cmd-comment"># 克隆仓库</span>
 git clone https://github.com/lululinran/liru-homework-reminder.git
 cd liru-homework-reminder
+
+<span class="cmd-comment"># 安装 Python 依赖 + 浏览器引擎</span>
 pip install playwright
-playwright install chromium
-        <button class="copy-btn" onclick="copyCode('code-mac-1', this)">复制</button>
+playwright install chromium<button class="copy-btn" onclick="copyCode('code-mac-1', this)">复制</button></div>
       </div>
-    </div>
 
-    <div class="step">
-      <div class="step-number">2</div>
-      <span class="step-icon">🔔</span>
-      <h3>配置微信推送（Server酱）</h3>
-      <p>零成本把提醒推到微信，只需扫码两步。</p>
-      <div class="code-block" id="code-mac-2">
-# 1. 打开 https://sct.ftqq.com/ 微信扫码登录
-# 2. 复制 SendKey，然后：
-cp config.json.example config.json
-# 编辑 config.json，填入 sendkey
-        <button class="copy-btn" onclick="copyCode('code-mac-2', this)">复制</button>
-      </div>
-      <div class="tip">💡 微信关注「方糖」公众号，推送消息会发到这里。</div>
-    </div>
-
-    <div class="step">
-      <div class="step-number">3</div>
-      <span class="step-icon">⏰</span>
-      <h3>设置每日自动提醒</h3>
-      <p>一键安装定时任务，每天早上 8:00 自动运行，无需手动操作。</p>
-      <div class="code-block" id="code-mac-3">
-# 先手动登录一次（保存 Cookie）
+      <div class="step">
+        <div class="step-num s2">2</div>
+        <div class="step-head">
+          <div class="step-icon-box cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          </div>
+          <h3>登录 &amp; 配置微信推送</h3>
+        </div>
+        <p>首次运行会弹出浏览器，手动登录砺儒云课堂。然后配置 Server酱推送。</p>
+        <div class="code-block" id="code-mac-2"><span class="cmd-comment"># 首次运行 - 弹出浏览器，手动登录</span>
 python3 fetch.py
-python3 report.py   # 测试推送是否正常
 
-# 安装定时任务
+<span class="cmd-comment"># 配置推送（复制模板并编辑）</span>
+cp config.json.example config.json
+<span class="cmd-comment"># 编辑 config.json，填入 Server酱 SendKey</span>
+<span class="cmd-comment"># 获取 SendKey: https://sct.ftqq.com/ 微信扫码登录</span>
+
+<span class="cmd-comment"># 测试推送</span>
+python3 report.py<button class="copy-btn" onclick="copyCode('code-mac-2', this)">复制</button></div>
+        <div class="tip-box info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>微信关注「方糖」公众号后，推送消息会发到你的微信里。免费版每天可发 5 条，完全够用。</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num s3">3</div>
+        <div class="step-head">
+          <div class="step-icon-box yellow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>设置每日自动提醒</h3>
+        </div>
+        <p>一行命令安装定时任务，每天早上 8 点自动推送，从此躺平。</p>
+        <div class="code-block" id="code-mac-3"><span class="cmd-comment"># 安装定时任务（每天 8:00 自动运行）</span>
 chmod +x setup_launchd.sh
 ./setup_launchd.sh install
 
-# 管理命令
-./setup_launchd.sh status    # 查看状态
-./setup_launchd.sh run       # 立即运行一次
-./setup_launchd.sh uninstall # 取消定时
-        <button class="copy-btn" onclick="copyCode('code-mac-3', this)">复制</button>
+<span class="cmd-comment"># 管理命令</span>
+./setup_launchd.sh status    <span class="cmd-comment"># 查看状态</span>
+./setup_launchd.sh run       <span class="cmd-comment"># 立即运行一次</span>
+./setup_launchd.sh uninstall <span class="cmd-comment"># 取消定时</span><button class="copy-btn" onclick="copyCode('code-mac-3', this)">复制</button></div>
+        <div class="tip-box warn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Cookie 通常几周后过期。过期后只需重新运行 <code style="background:rgba(255,201,64,0.15);padding:1px 6px;border-radius:4px;color:var(--yellow);">python3 fetch.py</code> 手动登录一次即可。</span>
+        </div>
       </div>
-      <div class="tip">⚠️ Cookie 有效期通常为几周，过期后重新运行 <code>python3 fetch.py</code> 即可。</div>
     </div>
-  </div>
 
-  <!-- Windows 面板 -->
-  <div id="panel-win" class="tab-panel">
-
-    <div class="step">
-      <div class="step-number">1</div>
-      <span class="step-icon">📦</span>
-      <h3>安装依赖</h3>
-      <p>安装 Python 3.8+ 和 Playwright（只需运行一次）。</p>
-      <div class="code-block" id="code-win-1">
+    <!-- Windows -->
+    <div id="panel-win" class="tab-panel">
+      <div class="step">
+        <div class="step-num s1">1</div>
+        <div class="step-head">
+          <div class="step-icon-box blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <h3>克隆 &amp; 安装依赖</h3>
+        </div>
+        <p>打开 PowerShell 或 CMD，粘贴以下命令。只需运行一次。</p>
+        <div class="code-block" id="code-win-1"><span class="cmd-comment"># 克隆仓库</span>
 git clone https://github.com/lululinran/liru-homework-reminder.git
 cd liru-homework-reminder
+
+<span class="cmd-comment"># 安装 Python 依赖 + 浏览器引擎</span>
 pip install playwright
-playwright install chromium
-        <button class="copy-btn" onclick="copyCode('code-win-1', this)">复制</button>
+playwright install chromium<button class="copy-btn" onclick="copyCode('code-win-1', this)">复制</button></div>
       </div>
-    </div>
 
-    <div class="step">
-      <div class="step-number">2</div>
-      <span class="step-icon">🔔</span>
-      <h3>配置微信推送（Server酱）</h3>
-      <p>同样用 Server酱，微信扫码即用。</p>
-      <div class="code-block" id="code-win-2">
-# 1. 打开 https://sct.ftqq.com/ 微信扫码登录
-# 2. 复制 SendKey，然后：
-copy config.json.example config.json
-# 编辑 config.json，填入 sendkey
-        <button class="copy-btn" onclick="copyCode('code-win-2', this)">复制</button>
-      </div>
-      <div class="tip">💡 微信关注「方糖」公众号，推送消息会发到这里。</div>
-    </div>
-
-    <div class="step">
-      <div class="step-number">3</div>
-      <span class="step-icon">⏰</span>
-      <h3>设置每日自动提醒</h3>
-      <p>以管理员身份打开 PowerShell，运行安装脚本。</p>
-      <div class="code-block" id="code-win-3">
-# 先手动登录一次（保存 Cookie）
+      <div class="step">
+        <div class="step-num s2">2</div>
+        <div class="step-head">
+          <div class="step-icon-box cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          </div>
+          <h3>登录 &amp; 配置微信推送</h3>
+        </div>
+        <p>首次运行会弹出浏览器窗口，手动登录砺儒云课堂。</p>
+        <div class="code-block" id="code-win-2"><span class="cmd-comment"># 首次运行 - 弹出浏览器，手动登录</span>
 python fetch.py
-python report.py
 
-# 以管理员身份打开 PowerShell，进入目录后：
-.\setup_task.ps1 install    # 安装定时任务
-.\setup_task.ps1 status     # 查看状态
-.\setup_task.ps1 run        # 立即运行一次
-.\setup_task.ps1 uninstall  # 取消定时
-        <button class="copy-btn" onclick="copyCode('code-win-3', this)">复制</button>
+<span class="cmd-comment"># 配置推送</span>
+copy config.json.example config.json
+<span class="cmd-comment"># 用记事本编辑 config.json，填入 SendKey</span>
+<span class="cmd-comment"># 获取 SendKey: https://sct.ftqq.com/</span>
+
+<span class="cmd-comment"># 测试推送</span>
+python report.py<button class="copy-btn" onclick="copyCode('code-win-2', this)">复制</button></div>
+        <div class="tip-box info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>微信关注「方糖」公众号后，推送消息会发到你的微信里。</span>
+        </div>
       </div>
-      <div class="tip">⚠️ 如希望锁屏时也能运行，打开「任务计划程序」→ 找到 LiruHomeworkReminder → 属性 → 安全选项 → 选择"无论用户是否登录都运行"。</div>
+
+      <div class="step">
+        <div class="step-num s3">3</div>
+        <div class="step-head">
+          <div class="step-icon-box yellow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>设置每日自动提醒</h3>
+        </div>
+        <p>以<strong>管理员身份</strong>打开 PowerShell，运行以下命令。</p>
+        <div class="code-block" id="code-win-3"><span class="cmd-comment"># 安装定时任务（每天 8:00 自动运行）</span>
+.\setup_task.ps1 install
+
+<span class="cmd-comment"># 管理命令</span>
+.\setup_task.ps1 status    <span class="cmd-comment"># 查看状态</span>
+.\setup_task.ps1 run       <span class="cmd-comment"># 立即运行一次</span>
+.\setup_task.ps1 uninstall <span class="cmd-comment"># 取消定时</span><button class="copy-btn" onclick="copyCode('code-win-3', this)">复制</button></div>
+        <div class="tip-box warn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>如希望锁屏时也能运行：任务计划程序 → LiruHomeworkReminder → 属性 → 安全选项 → "无论用户是否登录都运行"。</span>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Cookie 说明 -->
-  <div class="cookie-note">
-    <h4>🍪 关于 Cookie 自动登录</h4>
-    <p>首次运行 <code>python fetch.py</code> 会弹出浏览器让你手动登录，登录成功后 Cookie 自动保存到本地。<br>
-    之后定时任务使用 <code>--headless</code> 无头模式自动运行，不需要弹出浏览器。<br>
-    Cookie 过期（通常几周后）只需再手动运行一次 <code>python fetch.py</code> 重新登录即可。</p>
-  </div>
-
-  <!-- 页尾 -->
-  <div class="footer">
-    <a href="https://github.com/lululinran/liru-homework-reminder" target="_blank">
-      <span>⭐</span> 前往 GitHub 获取源码 <span>→</span>
-    </a>
-    <div class="footer-links">
-      <a href="https://sct.ftqq.com/" target="_blank">Server酱（微信推送）</a>
-      <a href="https://github.com/lululinran/liru-homework-reminder/issues" target="_blank">报告问题</a>
+  <!-- ═══════ FEATURES ═══════ -->
+  <section class="features-section reveal">
+    <h2 class="section-title">功能亮点</h2>
+    <p class="section-sub">为华师学子量身定制的作业管家</p>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <h3>全课程覆盖</h3>
+        <p>一键抓取砺儒云课堂所有课程作业，支持交互式选择课程</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon cyan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3>智能分类</h3>
+        <p>自动识别已过期、紧急（3天内）、待提交、无截止日期四类状态</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon yellow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>安全登录</h3>
+        <p>手动浏览器登录，不存储密码，不会锁号。Cookie 自动保存复用</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon pink">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+        <h3>多渠道推送</h3>
+        <p>Server酱（微信）、企业微信、邮件，三选一或全开</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h3>定时自动</h3>
+        <p>macOS / Windows 均支持定时任务，设置一次永久运行</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue-light)" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>开源透明</h3>
+        <p>全部代码开源，零成本使用，可自行修改定制</p>
+      </div>
     </div>
-  </div>
+  </section>
 
+  <!-- ═══════ CTA ═══════ -->
+  <section class="cta-section reveal">
+    <div class="cta-box">
+      <h2>开始使用</h2>
+      <p>开源免费，几分钟就能搞定。从此再也不怕忘交作业。</p>
+      <a href="https://github.com/lululinran/liru-homework-reminder" target="_blank" class="cta-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        前往 GitHub
+      </a>
+      <div class="footer-links">
+        <a href="https://sct.ftqq.com/" target="_blank">Server酱（微信推送）</a>
+        <a href="https://github.com/lululinran/liru-homework-reminder/issues" target="_blank">反馈问题</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="copyright">
+    Made with &#9829; for SCNU students &middot; MIT License
+  </div>
 </div>
 
 <script>
-function switchTab(os) {
+// Tab switching
+function switchTab(os, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  btn.classList.add('active');
   document.getElementById('panel-' + os).classList.add('active');
 }
 
+// Copy code
 function copyCode(id, btn) {
   const el = document.getElementById(id);
-  // 去掉按钮文字，只复制代码
-  const text = el.childNodes[0].textContent.trim();
+  const text = el.innerText.replace('复制', '').replace('已复制 ✓', '').trim();
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '已复制 ✓';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
   }).catch(() => {
-    // fallback
     const ta = document.createElement('textarea');
     ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
     document.body.appendChild(ta);
     ta.select();
     document.execCommand('copy');
@@ -475,16 +995,16 @@ function copyCode(id, btn) {
   });
 }
 
-// 入场动画：观察 .step 元素，依次显示
-const observer = new IntersectionObserver((entries) => {
+// Scroll reveal
+const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(e => {
-    if (e.isIntersecting) e.target.style.animationPlayState = 'running';
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
+    }
   });
 }, { threshold: 0.1 });
-document.querySelectorAll('.step').forEach(s => {
-  s.style.animationPlayState = 'paused';
-  observer.observe(s);
-});
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 </script>
 
 </body>
