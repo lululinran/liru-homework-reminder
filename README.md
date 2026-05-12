@@ -15,20 +15,55 @@
 ## 快速开始
 
 ```bash
-# 克隆仓库
+# 1. 克隆仓库
 git clone https://github.com/lululinran/liru-homework-reminder.git
 cd liru-homework-reminder
 
-# 安装依赖
+# 2. 安装依赖
 pip install playwright
 playwright install chromium
 
-# 首次运行（弹出浏览器，手动登录）
+# 3. 首次运行（弹出浏览器，手动登录砺儒云课堂）
 python fetch.py
+# 登录成功后选择要抓取的课程，等待抓取完成
 
-# 生成报告 + 推送
+# 4. 获取 Server酱 SendKey（微信推送用）
+#    ① 用浏览器打开 https://sct.ftqq.com/
+#    ② 微信扫码登录
+#    ③ 在页面复制你的 SendKey（格式: SCTxxxxx）
+
+# 5. 配置推送
+cp config.json.example config.json
+# 编辑 config.json，在 "sendkey": "" 里填入你的 SendKey
+# macOS: nano config.json （Ctrl+O 保存，Ctrl+X 退出）
+# Windows: notepad config.json
+
+# 6. 测试推送（微信应该会收到消息）
 python report.py
 ```
+
+## 定时自动提醒
+
+确认推送正常后，设置定时任务，每天自动运行：
+
+**macOS：**
+```bash
+chmod +x setup_launchd.sh
+./setup_launchd.sh install    # 安装（每天 8:00）
+./setup_launchd.sh status     # 查看状态
+./setup_launchd.sh run        # 立即运行一次
+./setup_launchd.sh uninstall  # 取消
+```
+
+**Windows（管理员 PowerShell）：**
+```powershell
+.\setup_task.ps1 install      # 安装（每天 8:00）
+.\setup_task.ps1 status       # 查看状态
+.\setup_task.ps1 run          # 立即运行一次
+.\setup_task.ps1 uninstall    # 取消
+```
+
+> Cookie 通常几周后过期，过期后重新运行 `python fetch.py` 手动登录一次即可。
 
 ## 帮同学设置
 
