@@ -51,7 +51,7 @@ nanobot gateway   # 扫码绑定微信
 
 # 6. 在 nanobot 管理页面添加 cron 任务
 #    命令: python3 ~/liru-homework-reminder/nanobot_check.py
-#    计划: 每天 08:00
+#    计划: 每天 09:00
 ```
 
 ### Server 酱方式
@@ -134,9 +134,9 @@ nanobot 启动后，在浏览器打开管理页面（终端会显示地址，通
 |------|-----|
 | 名称 | 砺儒作业检查 |
 | 命令 | `python3 ~/liru-homework-reminder/nanobot_check.py` |
-| 计划 | 每天 08:00（cron: `0 8 * * *`） |
+| 计划 | 每天 09:00（cron: `0 9 * * *`） |
 
-保存后，每天 08:00 自动运行，结果推送到微信。
+保存后，每天 09:00 自动运行，结果推送到微信。
 
 ### 首次使用
 
