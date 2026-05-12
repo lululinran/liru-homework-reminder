@@ -42,7 +42,14 @@ python fetch.py
 pip3 install nanobot-ai
 nanobot gateway   # 扫码绑定微信
 
-# 5. 在 nanobot 管理页面添加 cron 任务
+# 5. 配置 DeepSeek API（免费）
+#    ① 浏览器打开 https://platform.deepseek.com/ 注册并登录
+#    ② 左上角头像 → API Keys → 创建 API Key → 复制 Key
+#    ③ 编辑配置: nano ~/.nanobot/config.json
+#    ④ 在 providers.deepseek.apiKey 填入你的 Key
+#    ⑤ Ctrl+C 停掉 nanobot，再 nanobot gateway 重启
+
+# 6. 在 nanobot 管理页面添加 cron 任务
 #    命令: python3 ~/liru-homework-reminder/nanobot_check.py
 #    计划: 每天 08:00
 ```
@@ -65,16 +72,61 @@ python report.py
 
 ## Nanobot 2.0 微信推送（推荐）
 
-使用 [Nanobot](https://nanobot.app) 网关，作业提醒直接推送到微信，无需 Server 酱，免费使用。
+使用 [Nanobot](https://nanobot.app) 网关 + [DeepSeek](https://platform.deepseek.com/) 免费大模型，作业提醒直接推送到微信，还能在微信里直接问"今天有什么作业"。
 
-### 安装 Nanobot
+### 1. 安装 Nanobot
 
 ```bash
 pip3 install nanobot-ai
 nanobot gateway   # 启动网关，弹出微信二维码，扫码登录
 ```
 
-### 配置定时检查
+### 2. 配置 DeepSeek API（免费）
+
+Nanobot 需要 LLM 来理解指令和执行脚本，DeepSeek 注册即送免费额度。
+
+1. 用浏览器打开 [platform.deepseek.com](https://platform.deepseek.com/)，注册账号
+2. 登录后，点击左上角头像 →「API Keys」→「创建 API Key」
+3. 复制生成的 Key（格式: `sk-xxxxxxxx`）
+4. 编辑 nanobot 配置文件：
+
+```bash
+nano ~/.nanobot/config.json
+```
+
+在 `providers` 部分填入你的 Key：
+
+```json
+{
+  "providers": {
+    "deepseek": {
+      "apiKey": "sk-你的key",
+      "apiBase": "https://api.deepseek.com/v1",
+      "extraHeaders": null,
+      "extraBody": null
+    }
+  }
+}
+```
+
+同时确认 `agents.defaults` 部分：
+
+```json
+{
+  "agents": {
+    "defaults": {
+      "model": "deepseek-chat",
+      "provider": "deepseek"
+    }
+  }
+}
+```
+
+修改后重启 nanobot（`Ctrl+C` 停掉，再 `nanobot gateway`）。
+
+> **免费吗？** DeepSeek 新用户送 500 万 Tokens，每天查一次作业消耗极少，能用很久。
+
+### 3. 配置定时检查
 
 nanobot 启动后，在浏览器打开管理页面（终端会显示地址，通常是 `http://127.0.0.1:8080`），添加 cron 任务：
 
