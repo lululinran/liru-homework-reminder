@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+
+# 抓取的数据（包含课程信息）
+data/
+assignments_report.md
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
