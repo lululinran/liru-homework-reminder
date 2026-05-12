@@ -75,9 +75,11 @@ def build_push_text(report_text, summary):
     return "\n".join(lines)
 
 
-def push_serverchan(title, content, config):
+def push_serverchan(title, desp, config):
     """
     通过 Server酱 推送到微信。
+    title: 通知栏直接显示的文本（精简）
+    desp: 点击后查看的详细内容（Markdown）
     配置: config["serverchan"]["sendkey"]
     """
     sendkey = config.get("serverchan", {}).get("sendkey", "")
@@ -85,7 +87,7 @@ def push_serverchan(title, content, config):
         return False, "未配置 serverchan.sendkey"
 
     url = f"https://sctapi.ftqq.com/{sendkey}.send"
-    data = json.dumps({"title": title, "desp": content}).encode("utf-8")
+    data = json.dumps({"title": title, "desp": desp}).encode("utf-8")
     req = Request(url, data=data, headers={"Content-Type": "application/json"})
 
     try:
@@ -174,15 +176,18 @@ def push_email(title, content, config):
         return False, f"邮件推送失败: {e}"
 
 
-def push_all(title, push_text, full_markdown, config):
+def push_all(push_text, full_markdown, config):
     """
     根据配置推送所有已启用的渠道。
+    push_text: 精简文本（适合通知栏直接看）
+    full_markdown: 完整 Markdown 报告（适合点击查看详情）
     返回: list of (channel_name, success, message)
     """
     results = []
 
     if config.get("serverchan", {}).get("sendkey"):
-        ok, msg = push_serverchan(title, full_markdown, config)
+        # 方糖: title 放精简文本（通知栏直接看），desp 放完整报告（点进去看详情）
+        ok, msg = push_serverchan(push_text, full_markdown, config)
         results.append(("Server酱(微信)", ok, msg))
 
     if config.get("wecom", {}).get("webhook"):
@@ -190,7 +195,7 @@ def push_all(title, push_text, full_markdown, config):
         results.append(("企业微信", ok, msg))
 
     if config.get("email", {}).get("smtp_host"):
-        ok, msg = push_email(title, push_text, config)
+        ok, msg = push_email(push_text.split("\n")[0], push_text, config)
         results.append(("邮件", ok, msg))
 
     return results

@@ -22,7 +22,7 @@ fi
 # Step 1: 抓取数据
 echo ""
 echo "==> Step 1: 抓取作业数据..."
-python3 fetch.py --all $HEADLESS -o data/assignments_raw.json
+python3 fetch.py $HEADLESS -o data/assignments_raw.json
 
 # Step 2: 生成报告 + 推送
 echo ""

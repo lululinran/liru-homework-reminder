@@ -258,33 +258,25 @@ def main():
     if not args.no_push:
         config = load_config()
         if any(config.get(k) for k in ("serverchan", "wecom", "email")):
-            title = f"📖 砺儒作业提醒 ({now.strftime('%m-%d')})"
+            # 全部已提交 → 静默不推
             if total_unsubmitted == 0:
-                title += " 全部已提交"
-            elif len(overdue) > 0:
-                title += f" {len(overdue)}个已过期"
-            elif len(urgent) > 0:
-                title += f" {len(urgent)}个紧急"
-
-            summary = {
-                "total": total_unsubmitted,
-                "overdue": overdue,
-                "urgent": urgent,
-                "normal": normal,
-                "no_deadline": without_deadline,
-            }
-            push_text = build_push_text(report_text, summary)
-            results = push_all(title, push_text, report_text, config)
-
-            if results:
-                print("\n" + "-" * 40)
-                print("推送结果：")
-                for channel, ok, msg in results:
-                    status = "✅" if ok else "❌"
-                    print(f"  {status} {channel}: {msg}")
+                print("\n[推送] 全部已提交，无需提醒，跳过推送。")
             else:
-                print("\n[提示] 未配置推送渠道，跳过推送。"
-                      "创建 config.json 可开启微信/邮件提醒，详见 README。")
+                push_text = build_push_text(report_text, {
+                    "total": total_unsubmitted,
+                    "overdue": overdue,
+                    "urgent": urgent,
+                    "normal": normal,
+                    "no_deadline": without_deadline,
+                })
+                results = push_all(push_text, report_text, config)
+
+                if results:
+                    print("\n" + "-" * 40)
+                    print("推送结果：")
+                    for channel, ok, msg in results:
+                        status = "✅" if ok else "❌"
+                        print(f"  {status} {channel}: {msg}")
         else:
             print("\n[提示] 未找到 config.json，跳过推送。"
                   "创建 config.json 可开启微信/邮件提醒，详见 README。")
