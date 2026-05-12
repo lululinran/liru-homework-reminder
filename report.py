@@ -16,6 +16,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_INPUT = os.path.join(SCRIPT_DIR, "data", "assignments_raw.json")
 DEFAULT_OUTPUT_MD = os.path.join(SCRIPT_DIR, "assignments_report.md")
 DEFAULT_OUTPUT_JSON = os.path.join(SCRIPT_DIR, "data", "assignments_report.json")
+SELECTED_COURSES_FILE = os.path.join(SCRIPT_DIR, "data", "selected_courses.json")
 
 
 def parse_chinese_date(text):
@@ -82,12 +83,24 @@ def main():
     # 过滤1: 已提交的不要
     unsubmitted = [a for a in all_assignments if not a.get("submitted", False)]
 
-    # 过滤2: 手动标记为已提交的也不要
+    # 过滤2: 只保留 selected_courses.json 中选定的课程（如果存在）
+    selected_course_ids = None
+    if os.path.exists(SELECTED_COURSES_FILE):
+        try:
+            with open(SELECTED_COURSES_FILE, "r", encoding="utf-8") as f:
+                selected_course_ids = set(json.load(f))
+        except Exception:
+            pass
+    if selected_course_ids:
+        unsubmitted = [a for a in unsubmitted
+                       if a.get("courseid", 0) in selected_course_ids]
+
+    # 过滤3: 手动标记为已提交的也不要
     if manually_submitted:
         unsubmitted = [a for a in unsubmitted
                        if (a.get("courseid", 0), a.get("name", "")) not in manually_submitted]
 
-    # 过滤3: 课程关键词过滤
+    # 过滤4: 课程关键词过滤
     if course_keywords:
         unsubmitted = [a for a in unsubmitted
                        if any(kw in a.get("course", "") or kw in a.get("name", "")
