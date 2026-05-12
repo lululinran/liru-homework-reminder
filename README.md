@@ -14,12 +14,15 @@
 
 ## 快速开始
 
-> **怎么打开终端？**
-> - **macOS**：按 `Command + 空格` 调出搜索，输入 `Terminal` 或「终端」，按回车
-> - **Windows**：按 `Win + R`，输入 `powershell`，按回车；或右键开始菜单 →「Windows PowerShell」
+有两种推送方式可选：
+
+- **Nanobot 2.0**（推荐）：直接推送到微信，免费，无需任何第三方 Key → [查看配置步骤](#nanobot-20-微信推送推荐)
+- **Server 酱**：传统方式，需要 SendKey → [查看配置步骤](#配置推送)
+
+### 通用前置步骤（两种方式都需要）
 
 ```bash
-# 1. 克隆仓库
+# 1. 克隆仓库（必须克隆到 ~/liru-homework-reminder）
 git clone https://github.com/lululinran/liru-homework-reminder.git
 cd liru-homework-reminder
 
@@ -30,7 +33,23 @@ playwright install chromium
 # 3. 首次运行（弹出浏览器，手动登录砺儒云课堂）
 python fetch.py
 # 登录成功后选择要抓取的课程，等待抓取完成
+```
 
+### Nanobot 2.0 方式（推荐）
+
+```bash
+# 4. 安装并启动 Nanobot
+pip3 install nanobot-ai
+nanobot gateway   # 扫码绑定微信
+
+# 5. 在 nanobot 管理页面添加 cron 任务
+#    命令: python3 ~/liru-homework-reminder/nanobot_check.py
+#    计划: 每天 08:00
+```
+
+### Server 酱方式
+
+```bash
 # 4. 获取 Server酱 SendKey（微信推送用）
 #    ① 用浏览器打开 https://sct.ftqq.com/
 #    ② 微信扫码登录
@@ -39,14 +58,47 @@ python fetch.py
 # 5. 配置推送
 cp config.json.example config.json
 # 编辑 config.json，在 "sendkey": "" 里填入你的 SendKey
-# macOS: nano config.json （Ctrl+O 保存，Ctrl+X 退出）
-# Windows: notepad config.json
 
 # 6. 测试推送（微信应该会收到消息）
 python report.py
 ```
 
-## 定时自动提醒
+## Nanobot 2.0 微信推送（推荐）
+
+使用 [Nanobot](https://nanobot.app) 网关，作业提醒直接推送到微信，无需 Server 酱，免费使用。
+
+### 安装 Nanobot
+
+```bash
+pip3 install nanobot-ai
+nanobot gateway   # 启动网关，弹出微信二维码，扫码登录
+```
+
+### 配置定时检查
+
+nanobot 启动后，在浏览器打开管理页面（终端会显示地址，通常是 `http://127.0.0.1:8080`），添加 cron 任务：
+
+| 字段 | 值 |
+|------|-----|
+| 名称 | 砺儒作业检查 |
+| 命令 | `python3 ~/liru-homework-reminder/nanobot_check.py` |
+| 计划 | 每天 08:00（cron: `0 8 * * *`） |
+
+保存后，每天 08:00 自动运行，结果推送到微信。
+
+### 首次使用
+
+```bash
+cd ~/liru-homework-reminder
+python3 fetch.py          # 手动登录一次，保存 Cookie
+python3 nanobot_check.py  # 测试运行，微信应收到提醒
+```
+
+> **注意**：项目必须位于 `~/liru-homework-reminder`，`nanobot_check.py` 默认读取此路径。
+
+---
+
+## 定时自动提醒（经典方式）
 
 确认推送正常后，设置定时任务，每天自动运行：
 
@@ -85,8 +137,8 @@ chmod +x setup_launchd.sh
 - 自动抓取砺儒云课堂所有课程的作业信息
 - 智能识别作业提交状态（5种检测策略）
 - 按截止日期分类：已过期 / 紧急（3天内）/ 待提交 / 无截止日期
-- **消息推送**：支持 Server酱（微信）、企业微信机器人、邮件
-- **定时任务**：macOS（launchd）/ Windows（Task Scheduler），每天自动运行
+- **消息推送**：支持 Nanobot 2.0（微信直推，推荐）、Server酱、企业微信机器人、邮件
+- **定时任务**：macOS（launchd）/ Windows（Task Scheduler）/ Nanobot Gateway，每天自动运行
 - 支持手动标记已提交的作业、按课程过滤
 - Cookie 保存复用，首次登录后自动运行无需再次登录
 
@@ -108,8 +160,9 @@ cp config.json.example config.json
 ```
 liru-homework-reminder/
 ├── fetch.py                     # 作业数据抓取（支持 Cookie 复用）
-├── report.py                    # 报告生成 + 推送
-├── notify.py                    # 推送模块（Server酱/企业微信/邮件）
+├── report.py                    # 报告生成 + 推送（Server酱/企业微信/邮件）
+├── notify.py                    # 推送模块
+├── nanobot_check.py             # Nanobot 2.0 入口脚本（微信直推）
 ├── run.sh / run.bat            # 一键运行（macOS / Windows）
 ├── setup_launchd.sh            # macOS 定时任务安装
 ├── setup_task.ps1              # Windows 定时任务安装
