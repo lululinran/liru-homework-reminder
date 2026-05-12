@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>砺儒作业提醒 · 安装指南</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --accent: #f59e0b;
+    --bg: #0f0f23;
+    --card: #1a1a3e;
+    --card-border: rgba(99,102,241,0.3);
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --success: #10b981;
+    --radius: 16px;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* 背景动画 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99,102,241,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(245,158,11,0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+  }
+
+  /* ── Hero ─────────────────────── */
+  .hero {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeUp 0.7s ease-out both;
+  }
+  .hero-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+    display: block;
+    filter: drop-shadow(0 0 24px rgba(99,102,241,0.5));
+  }
+  .hero h1 {
+    font-size: 2.4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #818cf8, #6366f1, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    color: var(--text-dim);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+  .hero-badges {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 0.82rem;
+    color: var(--primary-light);
+  }
+
+  /* ── Tab 切换 ─────────────────── */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 5px;
+    border: 1px solid var(--card-border);
+    animation: fadeUp 0.7s ease-out 0.15s both;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--primary), #818cf8);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+  }
+  .tab-btn:hover:not(.active) {
+    color: var(--text);
+    background: rgba(255,255,255,0.04);
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── 步骤卡片 ─────────────────── */
+  .step {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 28px 28px 24px;
+    margin-bottom: 20px;
+    position: relative;
+    animation: fadeUp 0.6s ease-out both;
+  }
+  .step:nth-child(1) { animation-delay: 0.2s; }
+  .step:nth-child(2) { animation-delay: 0.35s; }
+  .step:nth-child(3) { animation-delay: 0.5s; }
+
+  .step-number {
+    position: absolute;
+    top: -14px;
+    left: 24px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    font-weight: 900;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(99,102,241,0.4);
+  }
+  .step-icon { font-size: 1.6rem; margin-bottom: 8px; display: block; }
+  .step h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #fff;
+  }
+  .step p {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.65;
+    margin-bottom: 14px;
+  }
+
+  /* Code block */
+  .code-block {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    color: #a5b4fc;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(99,102,241,0.2);
+    border: 1px solid rgba(99,102,241,0.3);
+    color: var(--primary-light);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .copy-btn:hover { background: rgba(99,102,241,0.35); }
+  .copy-btn.copied { background: rgba(16,185,129,0.2); border-color: var(--success); color: var(--success); }
+
+  .tip {
+    background: rgba(245,158,11,0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    color: #fbbf24;
+    line-height: 1.6;
+    margin-top: 4px;
+  }
+
+  /* ── 页尾 ─────────────────────── */
+  .footer {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    animation: fadeUp 0.7s ease-out 0.65s both;
+  }
+  .footer a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--primary), #818cf8);
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 28px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+  }
+  .footer a:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.45); }
+  .footer-links {
+    margin-top: 16px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+  }
+  .footer-links a {
+    background: none;
+    box-shadow: none;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    padding: 4px 0;
+    border-radius: 0;
+  }
+  .footer-links a:hover { color: var(--primary-light); box-shadow: none; transform: none; }
+
+  /* ── Cookie 方案说明 ────────── */
+  .cookie-note {
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-top: 28px;
+    animation: fadeUp 0.7s ease-out 0.8s both;
+  }
+  .cookie-note h4 { color: var(--success); font-size: 0.95rem; margin-bottom: 8px; }
+  .cookie-note p { font-size: 0.84rem; color: var(--text-dim); line-height: 1.65; }
+  .cookie-note code {
+    background: rgba(16,185,129,0.1);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 0.82rem;
+    color: #6ee7b7;
+  }
+
+  /* ── 动画 ─────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── 移动端 ──────────────────── */
+  @media (max-width: 600px) {
+    .container { padding: 24px 14px 40px; }
+    .hero h1 { font-size: 1.7rem; }
+    .hero-icon { font-size: 44px; }
+    .step { padding: 22px 18px 18px; }
+    .code-block { font-size: 0.76rem; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <span class="hero-icon">📖</span>
+    <h1>砺儒云课堂 · 作业提醒</h1>
+    <p>自动抓取砺儒云课堂作业，到期微信提醒你。<br>只需设置一次，之后每天自动提醒。</p>
+    <div class="hero-badges">
+      <span class="badge">🐍 Python 3.8+</span>
+      <span class="badge">🔔 微信推送</span>
+      <span class="badge">🍎 macOS / 🪟 Windows</span>
+      <span class="badge">⏰ 每日自动</span>
+    </div>
+  </div>
+
+  <!-- Tab 栏 -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('mac')">🍎 macOS</button>
+    <button class="tab-btn" onclick="switchTab('win')">🪟 Windows</button>
+  </div>
+
+  <!-- macOS 面板 -->
+  <div id="panel-mac" class="tab-panel active">
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <span class="step-icon">📦</span>
+      <h3>安装依赖</h3>
+      <p>先安装 Python 3.8+ 和 Playwright 浏览器引擎（只需运行一次）。</p>
+      <div class="code-block" id="code-mac-1">
+git clone https://github.com/lululinran/liru-homework-reminder.git
+cd liru-homework-reminder
+pip install playwright
+playwright install chromium
+        <button class="copy-btn" onclick="copyCode('code-mac-1', this)">复制</button>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <span class="step-icon">🔔</span>
+      <h3>配置微信推送（Server酱）</h3>
+      <p>零成本把提醒推到微信，只需扫码两步。</p>
+      <div class="code-block" id="code-mac-2">
+# 1. 打开 https://sct.ftqq.com/ 微信扫码登录
+# 2. 复制 SendKey，然后：
+cp config.json.example config.json
+# 编辑 config.json，填入 sendkey
+        <button class="copy-btn" onclick="copyCode('code-mac-2', this)">复制</button>
+      </div>
+      <div class="tip">💡 微信关注「方糖」公众号，推送消息会发到这里。</div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <span class="step-icon">⏰</span>
+      <h3>设置每日自动提醒</h3>
+      <p>一键安装定时任务，每天早上 8:00 自动运行，无需手动操作。</p>
+      <div class="code-block" id="code-mac-3">
+# 先手动登录一次（保存 Cookie）
+python3 fetch.py
+python3 report.py   # 测试推送是否正常
+
+# 安装定时任务
+chmod +x setup_launchd.sh
+./setup_launchd.sh install
+
+# 管理命令
+./setup_launchd.sh status    # 查看状态
+./setup_launchd.sh run       # 立即运行一次
+./setup_launchd.sh uninstall # 取消定时
+        <button class="copy-btn" onclick="copyCode('code-mac-3', this)">复制</button>
+      </div>
+      <div class="tip">⚠️ Cookie 有效期通常为几周，过期后重新运行 <code>python3 fetch.py</code> 即可。</div>
+    </div>
+  </div>
+
+  <!-- Windows 面板 -->
+  <div id="panel-win" class="tab-panel">
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <span class="step-icon">📦</span>
+      <h3>安装依赖</h3>
+      <p>安装 Python 3.8+ 和 Playwright（只需运行一次）。</p>
+      <div class="code-block" id="code-win-1">
+git clone https://github.com/lululinran/liru-homework-reminder.git
+cd liru-homework-reminder
+pip install playwright
+playwright install chromium
+        <button class="copy-btn" onclick="copyCode('code-win-1', this)">复制</button>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <span class="step-icon">🔔</span>
+      <h3>配置微信推送（Server酱）</h3>
+      <p>同样用 Server酱，微信扫码即用。</p>
+      <div class="code-block" id="code-win-2">
+# 1. 打开 https://sct.ftqq.com/ 微信扫码登录
+# 2. 复制 SendKey，然后：
+copy config.json.example config.json
+# 编辑 config.json，填入 sendkey
+        <button class="copy-btn" onclick="copyCode('code-win-2', this)">复制</button>
+      </div>
+      <div class="tip">💡 微信关注「方糖」公众号，推送消息会发到这里。</div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <span class="step-icon">⏰</span>
+      <h3>设置每日自动提醒</h3>
+      <p>以管理员身份打开 PowerShell，运行安装脚本。</p>
+      <div class="code-block" id="code-win-3">
+# 先手动登录一次（保存 Cookie）
+python fetch.py
+python report.py
+
+# 以管理员身份打开 PowerShell，进入目录后：
+.\setup_task.ps1 install    # 安装定时任务
+.\setup_task.ps1 status     # 查看状态
+.\setup_task.ps1 run        # 立即运行一次
+.\setup_task.ps1 uninstall  # 取消定时
+        <button class="copy-btn" onclick="copyCode('code-win-3', this)">复制</button>
+      </div>
+      <div class="tip">⚠️ 如希望锁屏时也能运行，打开「任务计划程序」→ 找到 LiruHomeworkReminder → 属性 → 安全选项 → 选择"无论用户是否登录都运行"。</div>
+    </div>
+  </div>
+
+  <!-- Cookie 说明 -->
+  <div class="cookie-note">
+    <h4>🍪 关于 Cookie 自动登录</h4>
+    <p>首次运行 <code>python fetch.py</code> 会弹出浏览器让你手动登录，登录成功后 Cookie 自动保存到本地。<br>
+    之后定时任务使用 <code>--headless</code> 无头模式自动运行，不需要弹出浏览器。<br>
+    Cookie 过期（通常几周后）只需再手动运行一次 <code>python fetch.py</code> 重新登录即可。</p>
+  </div>
+
+  <!-- 页尾 -->
+  <div class="footer">
+    <a href="https://github.com/lululinran/liru-homework-reminder" target="_blank">
+      <span>⭐</span> 前往 GitHub 获取源码 <span>→</span>
+    </a>
+    <div class="footer-links">
+      <a href="https://sct.ftqq.com/" target="_blank">Server酱（微信推送）</a>
+      <a href="https://github.com/lululinran/liru-homework-reminder/issues" target="_blank">报告问题</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(os) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('panel-' + os).classList.add('active');
+}
+
+function copyCode(id, btn) {
+  const el = document.getElementById(id);
+  // 去掉按钮文字，只复制代码
+  const text = el.childNodes[0].textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已复制 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '已复制 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// 入场动画：观察 .step 元素，依次显示
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.style.animationPlayState = 'running';
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.step').forEach(s => {
+  s.style.animationPlayState = 'paused';
+  observer.observe(s);
+});
+</script>
+
+</body>
+</html>

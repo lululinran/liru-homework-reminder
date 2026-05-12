@@ -4,6 +4,8 @@
 
 > **注意**：本工具仅供学习交流使用，请遵守学校相关规定。
 
+> 📱 **不想看文档？** 在手机上打开在线安装指南：`https://lululinran.github.io/liru-homework-reminder/`（需要在 GitHub 仓库 Settings → Pages 中启用）
+
 ## 功能
 
 - 自动抓取砺儒云课堂所有课程的作业信息
