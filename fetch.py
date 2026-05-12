@@ -324,7 +324,7 @@ def get_course_assignments(page, course_id, course_name):
 
                         results.push({{
                             name, course: courseName, courseid: courseId,
-                            cmid, duedate_str: dueDateText, duedate: dueTimestamp,
+                            cmid: cmId, duedate_str: dueDateText, duedate: dueTimestamp,
                             status, submitted, url: href,
                         }});
                     }}
@@ -377,7 +377,7 @@ def get_course_assignments(page, course_id, course_name):
 
                         results.push({{
                             name, course: courseName, courseid: courseId,
-                            cmid, duedate_str: dueDateText, duedate: dueTimestamp,
+                            cmid: cmId, duedate_str: dueDateText, duedate: dueTimestamp,
                             status: aStatus || '', submitted, url: href,
                         }});
                     }}
